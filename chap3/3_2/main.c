@@ -1,18 +1,17 @@
 // Intentionally unoptimized code.
 #include <stdio.h>
-#include <stdint.h>
 
-void multstore(int64_t, int64_t, int64_t *);
+void multstore(long, long, long *);
 
 int main(void) {
-	int64_t ld;
+	long ld;
 	multstore(2, 3, &ld);
 	printf("2 * 3 -> %ld\n", ld);
 	return 0;
 }
 
 
-int64_t mult2(int64_t a, int64_t b) {
-	int64_t s = a * b;
+long mult2(long a, long b) {
+	long s = a * b;
 	return s;
 }

@@ -5,7 +5,8 @@
 
 
 int main(void) {
-	type_selection();
+
+	while (type_selection());
 
 	return 0;
 }
