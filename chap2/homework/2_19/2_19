@@ -1,0 +1,10 @@
+T2U (Two' complement to Unsigned)
+
+For 4bit words.
+
+-1 -> 15 (1111)
+-5 -> 11
+-6 -> 10
+-4 -> 12
+1  -> 1
+8  -> 8

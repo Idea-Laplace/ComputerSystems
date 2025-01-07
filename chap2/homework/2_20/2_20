@@ -1,0 +1,11 @@
+Explain how Equation 2.5 aplies to the entries in the table
+you generated when solving 2_19
+
+x >= 0 ? x + 16 : x
+
+-1 + 16 = 15
+-5 + 16 = 11
+-6 + 16 = 10
+-4 + 16 = 12
+1 = 1
+8 = 8

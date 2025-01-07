@@ -1,0 +1,19 @@
+Principle:
+Truncation of an unsigned number
+
+Let x be the bit vector [x_(w-1), x_(w-2), ..., x_0], and let x' be
+the result of truncationg it to k bits: x' = [x_(k-1), x_(k-2), ..., x_0],
+Let y = B2U_w(x) and y' = B2U_k(x'), then y' = y mod 2^k.
+
+Principle:
+A similar property holds for truncating a two's complement number,
+  Except that it then converts the most significant bit into a sign bit.
+
+Truncation of a two's complement number
+
+Let x be the bit vector [x_(w-1), x_(w-2), ..., x_0], and let x' be
+the result of truncationg it to k bits: x' = [x_(k-1), x_(k-2), ..., x_0],
+Let y = B2T_w(x) and y' = B2T_k(x'), then y' = U2T_k (y mod 2^k).
+
+// Before U2T_k step, everything goes exactly same with unsigned number truncation process.
+Only the last U2T_k step makes difference, in which bit representation changes.

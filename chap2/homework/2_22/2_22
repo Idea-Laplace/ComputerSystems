@@ -1,0 +1,9 @@
+Show that each of the following bit vectors is a two's
+complement representation of -4 by applying Equation 2.3
+
+[x_(w-1), x_(w-2), ... , x_0] = -x_(w-1)2^(w-1) + SUM_{i=0, w-2}(x_i)2^i
+
+
+A [1100] = -8 + 4 = -4
+B [11100] = -16 + 8 + 4 = (-16 + 8) + 4 = -8 + 4 = -4
+C [111100] = -32 + 16 + 8 + 4 = (-32 + 16) + 8 + 4 = -8 + 4 = -4

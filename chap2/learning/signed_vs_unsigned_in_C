@@ -1,0 +1,38 @@
+C standard does not specify a particular representation
+of signed numbers, however, almost all machines use two's
+complement.
+
+Generally, most numbers are signed by default, adding u or U
+as a suffix creates an unsigned constant: for example,
+
+   12345U or 12345u.
+
+C allows conversions between unsigned and signed. Although
+the C standard does not specify precisely how this conversion
+should be made, most systems follow the rule that the underlying
+bit representation does no change.
+ This rule has the effect of applying the function U2T when con-
+-verting from unsigned to signed, T2U when converting from signee
+to unsigned.
+
+
+Conversions can happen due to explicit casting, such as in the
+following code:
+
+int tx, ty;
+unsigned ux, uy;
+
+tx = (int) ux;
+uy = (unsigned) uy;
+
+Alternatively, the can happen implicitly when an expression
+of one type is assigned to a variable of another, as in the 
+following code:
+
+int tx, ty;
+unsigned ux, uy;
+
+tx = ux; // Cast to signed.
+ux = ty; // Cast to unsigned.
+
+

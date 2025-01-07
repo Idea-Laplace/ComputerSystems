@@ -1,0 +1,61 @@
+i |= 1 << j  // sets bit j
+i &= ~(1 << j) // clears bit j
+i & 1 << j // tests bit j
+
+C operator precedence
+
+1. postfix operators (left to right associative)
+[] array subscripting
+() function call
+. structure[union] member
+-> structure[union] memeber from pointer
+++, -- increment or decrement(postfix)
+
+2. prefix operators(right to left associative)
+++, -- increment or decrement(prefix)
+& address
+* indirection
++, - unary plus or minus
+~ bitwise complement
+! logical negation
+sizeof sizeof operator
+
+---------------------------------------------------
+3. cast
+() parentheses
+---------------------------------------------------
+
+4. multiplicative
+*, /, % 
+
+5. additive
++, -
+---------------------------------------------------
+
+6. bitwise shift
+>> <<
+---------------------------------------------------
+
+7. relation
+<, >, <=, >=
+
+8. equality
+==, !=
+
+---------------------------------------------------
+9. & 10. ^ 11. |
+---------------------------------------------------
+12. && 13. ||
+---------------------------------------------------
+14. ? :
+---------------------------------------------------
+15. assignment
+=, +=, -=, *=, /=, &=, ^=, |=, <<=, >>=
+---------------------------------------------------
+16. , comma
+
+
+
+
+
+---------------------------------------------------

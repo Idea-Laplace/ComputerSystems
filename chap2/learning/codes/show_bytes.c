@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "show_bytes.h"
 
 #define INTERNAL static
 typedef unsigned char *byte_pointer;
