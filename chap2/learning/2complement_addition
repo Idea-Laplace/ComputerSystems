@@ -1,0 +1,57 @@
+Two's complement addition
+
+With two's complement addition, we must decide what to do when
+the result is either too large or too small(negatively, I mean.)
+to represent.
+
+Given integer values x and y in the range -2^(w-1) <= x, y < 2^(w-1) 
+, their sum is in the range -2^w <= x, y <= 2^w - 2, potentially requiring
+w + 1 bits to represent their sum exactly.
+
+As before, we avoid ever expanding data sizes by truncating the representation
+to w bits. The result is not as familiar mathematically as modular addition,
+however. Let us define x +(t, w) y to be the result of truncating the integer
+sum x + y to be w bits long and then viewing the result as a 2's complement number.
+
+x +(t, w) y =
+
+x + y - 2^w (x + y > TMax)
+x + y       (TMin <= x + y <= TMax)
+x + y + 2^w (x + y < TMin)
+
+
+x +(t, w) y := U2T(T2U(x) +(u, w) T2U(y))
+	         = U2T(((2^w)x_(w-1) + (2^w)y_(w-1) + x+y)mod2^w)
+	         = U2T((x + y)mod2^w)
+
+Let's define:
+z := x+y
+z' := x+(u,w)y = (x+y)mod2^w
+z" := x+(t,w)y = U2T((x+y)mod2^w) = U2T(z')
+
+case 1: -2^w <= z < -2^(w-1)
+z' = z + 2^w, range of which is 0 <= z' < 2^(w-1).
+Consequently, z" = z', hence
+x +(t,w) y = z" = x + y + 2^w
+
+case 2: -2^(w-1) <= z < 0
+z' ranges 2^(w-1) <= z' < 2^w, then z" ranges -2^(w-1) <= z" < 0
+hence,
+x +(t,w) y = z" = x + y
+
+case 3: 0 <= z < 2^(w-1)
+z = z' = z",
+x +(t,w) y = z" = x + y
+
+case 4: 2^(w-1) <= z < 2^w
+z' = z, z" ranges over -2^(w-1) <= z" < 0
+so,
+x +(t,w) y = z" = x + y - 2^w
+
+
+Principle: Detecting overflow in 2's complement addition
+For x and y in the range TMin <= x, y <= TMax, let s := x +(t,w) y.
+Then the computation of s has had positive overflow iff x > 0 and y > 0
+but s <=0. Similary, the computation has had negative overflow iff x < 0
+and y <0 but s >= 0. In other words, no pairs having different signs
+cannot make overflow happen.

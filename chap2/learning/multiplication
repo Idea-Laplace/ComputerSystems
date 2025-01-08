@@ -1,0 +1,15 @@
+x *(u, w) y = (x * y) mod(2^w)
+x *(t, w) y = U2T(x *(u, w) y)
+
+T2B(x *(t, w) y) = U2B(x *(u, w) y)
+
+Let x and y are in the range of two's complement representation,
+that is, from -2^(w-1) to 2^(w-1) - 1.
+
+x' := x + x_(w-1)2^w
+y' := y + y_(w-1)2^w
+
+both x and x' are have same bit representation, so do y and y'.
+
+T2B(x *(t, w) y) = T2B(U2T(x' *(u, w) y'))
+                 = U2B(x' *(u, w) y')

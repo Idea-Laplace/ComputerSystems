@@ -1,0 +1,9 @@
+/*
+   Fill in the following table showing the result of multiplying
+   different 3-bit numbers in the style of figure 2.27
+
+   0b100 * 0b101 = 0b10100 mod 2^3 = 20 mod8 = 4
+   0b010 * 0b111 = 0b1110 mod 8 = 14 mod8 = 6 = 0b110 (6u, -2)
+   0b110 * 0b110 = 0b100100 mod 8 = 0b100 = 4 (-4, two's complement)
+*/
+
