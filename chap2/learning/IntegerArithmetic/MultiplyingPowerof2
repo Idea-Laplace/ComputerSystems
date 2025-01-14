@@ -1,0 +1,44 @@
+Historically, the integer multiply instruction on many machines
+was fairly slow, requiring 10 or more clock cycles, whereas other
+integer operations-such as addition subtraction, bit-level operations
+and shifting- required only 1 clock cycle. Even on the Intel Corei7
+Haswell we use our reference machine, inter multiply requires 3 clock
+cycles. As a consequence, one important optimization used by compilers
+is to attempt to replace multiplication by constant factors with comb-
+-inations of shift and addition operations.
+
+We will first consider the case of multiplying by a power of 2, and
+then we'll generalize this to arbitary constans.
+
+Principle: Multiplication by a power of 2.
+
+Let x be the unsigned integer represented by bit pattern
+x = [x_(w-1), ..., x_1, x_0],
+Then for any nonnegative k, the (w+k)-bit unsigned representation
+of x2^k is given by [x_(w-1),...,x_0, 0, 0, ..., 0], where trailing
+k zeros have been added to the right.
+
+Derivation of this principle is trivial.
+----------------------------------------------------------------------
+ Generalizing from our example, consider the task of generating code for
+ the expression  x * K, for some constant K. The compiler can express
+ the binary representation of K as an alternating sequence of 0s and 1s:
+
+ [(0...0)(1...1)(0...0)(1...1)] 
+ (In each parenthese has a contagious seies of 0s or 1s)
+ For example, 14 can be written as [(0...0)(111)(0)].
+ Consider a run of from bit position n down to bit position m (n >= m).
+ (For the case of 14, we have n = 3, m = 1.) We can compute the effect
+ of these bits on the product using either of two different forms:
+
+ Form A: (x << n) + (x << (n-1)) + ... + (x << (m+1)) + (x << m)
+ Form B: (x << (n+1)) - (x << m)
+
+ By adding together the results for each run, we are able to compute
+ x * K without any multiplications. Of course, the trade-off between
+ using combinations of shifting, adding, subtracting versus a single
+ multiplication instruction depends on the relative speeds of these
+ intructions, and these can be highly machine dependent.
+ Most compilers only perform this optimaization when a small number
+ of shifts, adds, and subtractions suffice.
+

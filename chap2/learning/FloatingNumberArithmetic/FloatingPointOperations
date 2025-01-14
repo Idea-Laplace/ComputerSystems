@@ -1,0 +1,57 @@
+The IEEE standards specifies a simple rule for determining the result
+of an arithmetic operation such as addition or multiplication. Viewing
+floating-point values x and y as real numbers, and some operation $ defined
+over real numbers, the computation should yield Round(x $ y), the result of
+applying rounding to the exact result of the real operation. In practice,
+there are clever tricks floating-point unit designers use to avoid performing
+this exact computation, since the computation need only by sufficiently precise
+to guarantee a correctly rounded result. When one of the arguments is a special
+value, such as -infinity or +infinity, -0, or NaN, the standard specifies conv-
+entions that attempt to by reasonable. For example, 1/-0 is defined to yiele
+-infinity, while 1/+0 is defined to yield infinity.
+
+One strength of the IEEE standard's method of specifying the behavior of
+floating-point operations is that it is independent of  any particular hardware
+or software realization.
+
+x +(f) y is commutative, but not associative, that is,
+
+3.14 + (1.0e10 - 1.0e10) would yield 3.14, while
+(3.14 + 1.0e10) - 1.0e10 would yield 0.
+
+infinity - infinity = NaN, since NaN +(f) x = NaN for any x.
+
+THe lack of associativity in floating-point addition is the most important
+group property that is lacking. This causes many subtle troubles when writing codes
+for scientists or compiler writers. For example:
+
+x = a + b + c;
+y = b + c + d;
+
+The compiler might be tempted to save one floating-point addition by generating
+the following code:
+
+t = b + c;
+x = a + t;
+y = t + d;
+
+However, this computation might yield a different value for x thatn would the original.
+So avoid any optimizations that could have enven the slightest effect on functionality.
+
+Same property is true for the floating point multiplication, commutative but not associative.
+
+On the other hand, floating point addition satisfies the following monotonicity property:
+
+if a >= b, then x +(f) a >= x +(f) b if x is not NaN, which is not obeyed by unsigned or
+two's complement integer addition.
+
+For multiplication,
+
+a >= b and c >= 0, then a *(f) c >= b *(f) c
+a >= b and c <= 0, then a *(f) c <= b *(f) c
+a *(f) a >= 0 as long as a is not NaN
+
+Lastly, floating point operatations are not distributive, that is:
+ a * (b + c) != a * b + a * c, derived from the non-associative property.
+
+ 1e20 * (1e20 - 1e20) would yield 0, while 1e20 * 1e20 - 1e20 * 1e20 would result NaN.

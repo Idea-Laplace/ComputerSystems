@@ -1,0 +1,17 @@
+A. For a floating format with an n-bit fraction, give a formula
+for the smallest positive integer that cannot be represented exactly.
+Assume the exponent field size k is large enough that the range of
+representable exponents does not provide a limitation for this problem.
+
+sol) The LSB of n-bit fraction represent the value of 2^(-n).
+     When the exponent value comes to be 2^n, the number ranges from
+	 2^n, 2^n + 1, ... ,2^n + 2^(n-1) + ... + 1
+	 and finally to 2^(n+1). The next integer should be 2^(n+1) + 2,
+	 not 2^(n+1) + 1.
+
+	 2^(n+1) + 1.
+
+B. What is the numeric value of this integer for single-precision format,
+   n=23?
+
+Ans) 2^24 + 1.

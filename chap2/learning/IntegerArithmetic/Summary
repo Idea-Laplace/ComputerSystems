@@ -1,0 +1,14 @@
+As we have seen, the 'integer' arithmetic performed by computers
+is really a form of modular arithmetic. The finite word size used
+to represent numbers limits the range of possible values, the resulting
+operations can overflow. We have also seen that the two's complement
+representation povides a clever way to represent both negative and
+positive values, while using the same bit-level implementations as are
+used to perform unsigned arithmetic.
+	we've seen that some of the conventions in the C language can yield
+some surprising results, and these can be sources of bugs that are hard
+to recognize or understand. We've especially seen that the unsigned data
+type, while conceptually straightforward, can lead to behaviors that even
+experienced programmers do not expect. We've also seen that this data type
+can arise in unexpected ways-for example, when writing integer constants
+and when invoking library routines.

@@ -1,0 +1,39 @@
+The IEEE floating-point format defines 4 different rounding modes:
+
+Mode				1.40	1.60	1.50	2.50	-1.50
+---------------------------------------------------------
+Round to even		1		2		2		2		-2
+Round toward zero	1		1		1		2		-1
+Round down			1		1		1		2		-2
+Round up			2		2		2		3		-1
+---------------------------------------------------------
+
+
+The 'Round to even(also called round to nearest)' is the default mode.
+Round-to-even  mode adopts the convention that it rounds the number
+either upward or downward such that the least significant digit of the
+result is even.
+
+Here comes a question- why is there any reason to prefer even numbers?
+Why not consistently round values halfway between 2 representable values
+upward? The problem with such a convention is that one can easily imagine
+scenarios in whcih rounding a set of data values would then introduce a
+statistical bias into the computation of an average of the values. The
+average of a set of numbers that we roundee by this means would be slightly
+higher that the average of the numbers themselves.
+Rounding toward even numbers avoids this statistical bias in most real-life
+situations. It will round upward about 50% of the time and round down about 
+50% of the time.
+
+We consider least significant bit value 0 to be even and 1 to be odd.
+In general, the rounding mode is only significant only when we have a bit
+pattern of the form XX...X.YYYYYYY100..., where X and Y denote arbitary
+bit values with the rightmost Y being the position to which we wish to round.
+Only the bit patterns of this form denote values that are halfway between two
+possible results. As examples, consider the problem fo rounding values to the
+nearest quarter(i.e. 2bits to the right of the binary point.) We would round
+10.00011_2 round down to 10.00_2 and 10.00110_2 round up to 10.01_2, because
+these values are not halfway between  two possible values. We would round
+10.111000 up to 11.00 and 10.101000 down to 10.10, since these values are halfway
+between two possible results. and we prefer to have the least significant bit
+equal to 0.

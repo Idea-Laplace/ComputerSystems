@@ -1,0 +1,29 @@
+Single precision
+
+* ******** ***********************
+
+1 sign bit: 0 positive, 1 negative.
+8 exponent bits
+23 significand bits
+
+Double precision
+
+* *********** ****************************************************
+
+1 sign bit
+11 exponent bits
+52 significand bits
+
+----------------------------------------------------------------------------------------------------
+
+
+bias: When an exponent bit set has the size of k, the value of bias is 2^(k-1) - 1,
+	for example, if k = 8, the bias should be 2^(8-1) - 1 = 127.
+
+	Let E be denote the 'real' value of an exponent, while e be denote 'representative' value
+	of an exponent, represented in the exponent bits, then the relation btw E and e is:
+
+	E = e - bias, or e = E + bias
+
+
+

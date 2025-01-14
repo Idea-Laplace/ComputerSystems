@@ -1,0 +1,69 @@
+	Integer division on most machine is even slower than
+integer multiplication-requiring 30 or more clock cycles.
+Dividing by a power of 2 can also be performed using shift
+operations but we use a right shift rather than a left shift.
+The two different right shifts-logical and arithmetic-serve
+this purpose for unsigned and two's complement numbers repectively.
+
+	Integer division always rounds toward zero. To define this more
+precisely, let us introduce some notation. For any real number a, 
+define |_a_| to be the unique integer a' such that a'<= a <a'+1.
+Similarly, define |-a-| to be the unique integer a" such that
+a"-1 < a <= a".
+
+	For x >= 0 and y > 0, x/y yields |_x/y_|, while for x < 0 and y > 0,
+x/y yields |-x/y-|.
+
+Principle: Unsigned division by a power of 2.
+For 0 <= k < w, x / 2^k = |_(x >> k)_|
+
+
+----------------------------------------------------------------------
+	The case for dividing by a power of 2 with 2's complement arithmetic
+is slightly more complex. First, the shifting should be performed using
+an arithmetic right shift, to ensure that negative values remain negative.
+Let us investigate what value sych a right shift would produce.
+
+Principle: Two's complement division by a power of 2, rounding down
+
+Let C variable x and k have two's complement value x and unsigned value
+k, repectively, sych that 0 <= k < w. The C expression x >> k, when the
+shift performed arithmetically, yields the value |_(x/2^k)_|.
+
+Derivation
+Let x be the 2's complement integer represented by bit pattern [x_(w-1), ... ,x_0],
+and let k be in the range 0 <= k < w. Let x' be the two's complement number
+represented by the w-k bits [x_(w-1), ..., x_k](where x_(w-1) is the (w-k)th bit.)
+and let x" be the unsigned number represented by the low-order k bits 
+[x_(k-1), ..., x_0]. By a similar analysis as the unsigned case,
+we have x = 2^kx' + x" and 0 <= x" < 2^k, giving
+x' = |_x/2^k_|. Furthermore, observe that shifting bit vector [x_(w-1), ... x_0] right
+arithmetically by k yields the bit vector
+[x_(w-1) ...(k terms)..., x_(w-1), ..., x_k]
+which is the sign extension from w-k bits of [x_(w-1), ..., x_k]. Thus, this shifted bit
+vector is the two's complement representation of |_(x/2^k)_|.
+
+	We can correct for the improper rounding that occurs thwn a negative number is shifted
+right by 'biasing' the value before shifting.
+
+Principle: Two's complement division by a power of 2, rounding up
+
+Let C variable x and k have tow's complement value x and unsigned value k, respectively.
+such that 0 <= k < w. The C expression (x +  (1 << k) - 1) >> k, when the shift si performed
+arithmetically, yields the value |-(x/2^k)-|.
+
+Derivation
+Let x be the 2's complement integer represented by bit pattern [x_(w-1), ... ,x_0],
+and let k be in the range 0 <= k < w. Let x' be the two's complement number
+represented by the w-k bits [x_(w-1), ..., x_k](where x_(w-1) is the (w-k)th bit.)
+and let x" be the unsigned number represented by the low-order k bits 
+[x_(k-1), ..., x_0].
+
+x = x'2^k + x",
+(1 << k) - 1 affect on x' iff x" != 0, if x" == 0, (1 << k) - 1 make no effect on x/2^k
+|-(x/y)-| = |_((x+y-1)/y)_| for inters x and y and y > 0.
+
+	These analyses show that for a two's complement machine using arithmetic right shifts,
+	the C expression:
+	(x < 0 ? x + (1 << k) - 1 : x) >> k
+will compute the value x/2^k.

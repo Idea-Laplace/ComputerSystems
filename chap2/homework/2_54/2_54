@@ -1,0 +1,31 @@
+Assume variable x, f and d are of type int, float, double, respectively.
+Their values are arbitary, except that neither f nor d equals +-infinity, or NaN.
+For each of the following C expressions, either argue that it will always be true
+or given a value for the variables such that it is not true.
+
+
+A. x == (int)(double) x
+True, double can fully represent the data type int.
+
+B. x == (int)(float) x
+False, put x = TMax, 01111111 11111111 11111111 11111111
+
+which should be converted to 0 10011110 00000000000000000000000
+
+C. d == (double)(float) d
+False, 1e200 would yield infinity if converted to a float type data
+
+D. f == (float)(double) f
+True, double type can fully represent the data type float
+
+E. f == -(-f)
+True, just a coversion of the sign bit.
+
+F. 1.0 / 2 == 1 / 2.0
+True, before computing the divsion, integers are casted to floating type.
+
+G. d * d >= 0.0
+True.
+
+G (f + d) - f == d
+False, if f + d yields infinity, or the precision of d take over that of float type.

@@ -1,0 +1,55 @@
+Type			Form				Operand Value				Name					Example
+-----------------------------------------------------------------------------------------------------
+Immediate		$Imm				Imm							Immediate				$-577, $0x1f
+
+Register		r_a					R[r_a]						Register				%rax
+
+Memory			Imm					M[Imm]						Absolute				577, 0x1f
+Memory			(r_a)				M[R[r_a]]					Indirect				(%rax)
+Memory			Imm(r_b)			M[Imm + R[r_b]]				Base + displacement		9(%rax)
+
+Memory			(r_b, r_i)			M[R[r_b] + R[r_i]]			Indexed					(%rax, %rbx)
+Memory			Imm(r_b, r_i)		M[Imm + R[r_b] + R[r_i]]	Indexed					260(%rax, %rbx)
+
+Memory			(,r_i, s)			M[R[r_i]*s]					Scaled indexed			
+Memory			Imm(,r_i, s)		M[Imm + R[r_i]*s]			Scaled indexed
+Memory			(r_b ,r_i, s)		M[R[r_b] + R[r_i]*s]		Scaled indexed
+Memory			Imm(r_b,,r_i, s)	M[Imm + R[r_b] + R[r_i]*s]	Scaled indexed
+-----------------------------------------------------------------------------------------------------
+R[a]: The reference value contained in a.
+M[a]: In the virtual array consisting of memory byte, the reference value of index 'a'.
+$35 : the integer value 35 itself.
+35  : the reference value at pointer 35.
+-----------------------------------------------------------------------------------------------------
+
+Most instructions have one or more operands specifying the source values to use
+in performing an operation adn the destinatio loaction into which to place the 
+results. x86-64 supports a number of operand froms(figure above). Source values
+can be given as constants or read from registers or memory. Results can be stored
+in either registers or memory. Thus, the different operand possibilities can be
+classified into 3 types.
+
+1. immediate
+Immediate is for constant values. In ATT-format assembly code, these are written
+a '$' followed by an integer using standard C notation-for example, $-577 or $0x1f.
+
+2. register
+Denotes the contents of a register, one of sixteen 8-, 4-, 2-, 1-byte low-order portion
+of the registers for operands having 64, 32, 16, 8 bits respectively.
+
+3. memory reference
+A memory reference, which we access some memory location according to a computed address,
+often called the effective address. Since we view the memory as a large array of bytes,
+we use the notation M_b[addr] to denote a reference to the b-byte value stroed in memory
+starting at address 'addr'.
+
+Imm(r_b, r_i, s)
+Imm: immediate offset
+r_b: Base register
+r_i: index register
+s  : scale factor
+
+(Imm + R[r_b]) : Base
+R[r_i]         : Index
+s              : Scale(byte unit)
+This general form is ofen seen when referencing elements of arrays.

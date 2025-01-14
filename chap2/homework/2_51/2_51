@@ -1,0 +1,22 @@
+We saw in Problem 2.46 that the Patriot missile software approximated 0.1
+as x = 0.00011001100110011001100_2. Suppose instead that they had used IEEE
+round-to-even mode to determine an approximation x' to 0.1 with 23 bits to
+the right of the binary point.
+
+A. What is the binary representation of x'?
+
+x' = 0.00011001100110011001101_2 
+
+B. What is the approximatate decimal value of x' - 0.1?
+
+x' - 0.1 = 0.000 0000 0000 0000 0000 0000[0011]
+
+C. How far off would the computed clock have been after 100 hours of operation?
+
+(x' - 0.1) * 10 * 3600 * 100 = 0.1 * 2^(-22) * 10 * 3600 * 100 = 0.0858s
+
+D. How far off would the program's prediction of the position of the Scud missile
+   have been?
+
+   0.0858 s * 2000 m/s = 172 m
+

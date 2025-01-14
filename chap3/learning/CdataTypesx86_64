@@ -1,0 +1,25 @@
+C declaration		Assembly-code suffix	Size(byte)
+------------------------------------------------------
+   char				b(byte)                 1
+   short			w(word)					2
+   int				l(double)				4
+   long				q(quad)					8
+   char *			q(quad)					8
+   float			s(single)				4
+   double			l(double)				8
+------------------------------------------------------
+
+
+Microprocessors in the x86 family historically implemented all
+floating-point operations with a spectial 80-bit(10 bytes) floating
+point format. This format can be specified in C programs using the
+declaration long double. We recommend against using this format, however.
+It is not portable to other classes of machines, and it is typically not
+implemented with the same high-performance hardware as is the case for
+single- and double-precision arithmetic.
+
+
+The assembly code uses the suffix 'l' to denote a 4-byte integer
+as well as an 8-byte double-precision floating point number.
+This causes no ambiguity, however, since floating-point code involves
+an entirely different set of instructions and registers.

@@ -1,0 +1,34 @@
+Consider the following two 7-bit floating-point representation based
+on IEEE floating-point format. Neither has a sign bit - tey can only
+represent nonnegative numbers.
+
+1. Format A
+	There are k=3 exponent bits. The exponent bias is 3.
+	There are n=4 fraction bits.
+2. Format B
+	There are k=4 exponent bits. The exponent bias is 7.
+	There are n=3 fraction bits.
+
+Below, you are given some bit patterns in format A, and your
+task is to convert them to the closest value in format B. If
+necessary, you should apply the rounding-to-even rounding rule.
+In addition, give the values of numbers given by the format A
+and format B bit patterns. Give these as whole numbers or as
+fractions
+
+Format A 
+  Bits		Value
+011 0000	2^(3-3) * (1.000) = 1
+101 1110	2^(5-3) * (1+7/8) = 15/2
+010 1001    2^(2-3) * (1+9/16) = 25/32
+110 1111    2^(6-3) * (1+15/16) = 31/2
+000 0001    2^(1-3) * (1/16) = 1/64
+
+Format B
+
+  Bits		Value
+0111 000    2^(7-7) * 1 = 1
+1001 111	2^(9-7) * (1+7/8) = 15/2
+0110 100	2^(6-7) * (1+1/2) = 3/4 = 24/32 (1/32 loss, round down)
+1011 000    2^(11-7) * 1 = 16 = 32/2 (1/2 gain, round up)
+0001 000	2^(1-7) * 1 = 1/64 (from denorm to norm)

@@ -1,0 +1,43 @@
+All versions of C provide 2 different floating-point data types:
+float and double. On machines that support IEEE floating point,
+these data types correspond to single- and double-precision floating
+point. In addition, the machines use the round-to-even rounding mode.
+
+Unfortuneately, since the C stnadards do not require the machine to
+use IEEE floating point, there are no standard methods to change the
+rounding mode or to get  special values such as -0, +infinity, -infinity,
+or NaN.
+
+Most systems porvide a combination of include .h files and procedure libraries
+to provide access to these feature, but the details vary from one systems to
+another. For example, the GNU compiler GCC defines program constants INFINITY
+and NAN when the followingsequence occurs in the program file:
+
+#define _GNU_SOURCE 1
+#include <math.h>
+
+----------------------------------------------------------------------------------------------------
+
+When casting values between int, float and double formats, the program
+changes the numeric values and the bit representations as follows:
+(assuming data type int is 32 bits)
+
+From int to float, the number cannot overflow, but it may be rounded.(32(31) bits vs 23 fraction bits)
+
+From int or float to double, the exact numeric value can be preserved because
+double has both greater range as well as greater precision
+
+From double to float, the value can overflow to +-infinity, since the range is smaller.
+Otherwise, it may be rounded, because the precision is smaller.
+
+From float or double to int, the value will be rounded toward zero. For example,
+1.999 will be converted to 1, while -1.999 will be converted to -1, Furthermore, the value
+may overflow.
+
+The C standards do not specify a fixed result for this overflow case.
+
+Intel-compatible microprocessors designate the bit pattern TMin as an integer indefinite value.
+Any conversion from floating point to integer that connot assign a resonable integer approximation
+yields this value. Thus, the expression (int) +1e10 yields -2147483648, generating a negative value
+from a positive one.
+
