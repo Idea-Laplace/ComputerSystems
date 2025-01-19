@@ -6,7 +6,12 @@
    B> Any bit of x equals 0.
    C> Any bit in the least significant byte of x equals 1.
    D> Any bit in the most significant byte of x  equals 0.
+
+   Your code should follow the bit-level integer coding rules, with the additional
+   restriction that you may not use equality or inequality(== and !=) tests.
 */
+
+// Function definitions are in the other file, solution.c.
 
 #include <stdio.h>
 #include <limits.h>

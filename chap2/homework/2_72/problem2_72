@@ -1,0 +1,34 @@
+You are given the task of writing a function that will copy an integer val
+into a buffer buf, but it should do so only if enough space is available in
+the buffer. Here is the code you write:
+
+// Copy integer into buffer if space is available
+// Warning: The following code is buggy.
+void copy_int(int val, void *buf, int maxbyte) {
+	if (max_byte - sizeof(val) >= 0)
+		memcpy(buf, (void *) &val, sizeof(val));
+}
+
+This code makes use of the library function memcpy. Although its use
+is a bit artificial here, where wy simply want to copy an int, it illustrates
+an approach commonly used to copy larger data structures.
+
+You carefully test teh code and discover that it always copies the value to the
+buffer, even when maxbyte is too small.
+
+A. Explain why the conditional test in the code always succeeds.
+Hint: The sizeof operator returns a value of type size_t.
+
+B. Show how you can rewrite the conditional test to make it work properly.
+
+
+
+A: The type size_t is a kind of unsigned types, which would cast the max_byte
+and the 0 of rightside to the type unsigned. Consequently, the max_byte - sizeof(val)
+would be always nonzero, which makes max_byte - sizeof(val) >= 0 true.
+
+B:
+void copy_int(int val, void *buf, int maxbyte) {
+	if (max_byte - (int) sizeof(val) >= 0)
+		memcpy(buf, (void *) &val, sizeof(val));
+}
