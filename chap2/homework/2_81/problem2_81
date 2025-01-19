@@ -1,0 +1,7 @@
+Write C expression to generate the bit patterns that follow, where
+a^k represents k repetition of symbol a. Assume a w-bit data type.
+Your code may contain reference to parameter j and k, representing
+the values of j and k, but not a parameter representing w.
+
+A. 1^(w-k)0^k
+B. 0^(w-k-j)1^k0^j
