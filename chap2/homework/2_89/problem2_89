@@ -1,0 +1,67 @@
+We are running programs on a machine where values of type int
+have a 32-bit two's-complement representation. Values of type
+float use the 32-bit IEEE format, and values of type double use
+the 64-bit IEEE format.
+
+We generate arbitrary integer values x, y, and z, and converts
+them to values or type double as follows:
+
+int x = random();
+int y = random();
+int z = random();
+
+double dx = (double) x;
+double dy = (double) y;
+double dz = (double) z;
+
+For each of the following C expression, you are to indicate whether or not
+the expression always yields 1. If it always yields 1, describe the underlying
+mathematical principles. Otherwise, give an example of arguments that make it
+yield 0. Note that you cannot use an IA32 machine running GCC to test your an-
+sers, since it would use the 80-bit extended-precision representation for both
+float and double.
+
+A. (float) x == (float) dx
+
+True, (float) dx is actually (float) (double) x,
+where the type double can mount all int types on
+its fraction bits(52 bits.)
+
+B. dx - dy == (double) (x - y)
+Almost true but false due to the case y = INT_MIN,
+dx - dy has no harm for it, but in int type, -y would be just y.
+
+
+C. (dx + dy) + dz == dx + (dy + dz)
+True, since their exponents ranges at most from 0 to 9.
+The precision of the type double can afford it.
+
+D. (dx * dy) * dz == dx * (dy * dz)
+False.
+
+The smallest positive integer that cannot be exactly presented with double:
+
+2^53 + 1.
+To be more precise, if the difference btw the most significant expoent number and
+the another significant one is equal to or larger than 53(n+1), the series of bits
+should be rounded.
+
+x = 2^30 + 1
+y = 2^23 + 1
+z = 2^20 + 1
+
+dx * dy = 2^53 + 2^30 + 2^23  = dr   (The rightmost one truncated)
+dr * dz = 2^73 + 2^53 + 2^50 + 2^43 + 2^30 + 2^23 (dr * dz itself is computed without rounding)
+
+dy * dz = 2^43 + 2^23 + 2^20 + 1 = dr' (no rounding happens)
+dx * dr' = 2^73 + 2^53 + 2^50 + 2^43 + 2^30 + 2^23 + (2^20 + 1) (now this should be rounded up,
+		although 73 - 20 = 53,
+		since this is not exactly 2^20, which would have been truncated by the round to even rule.)
+
+Bit representation
+(dx * dy) * dz : 0 10001001000 0000000000000000000100100000010000000000001000000100
+dx * (dy * dz) : 0 10001001000 0000000000000000000100100000010000000000001000000101
+
+
+E. dx / dx == dz / dz
+False when one of them is zero.

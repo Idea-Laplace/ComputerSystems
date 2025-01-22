@@ -1,0 +1,73 @@
+We are running porgrams where values of type int are 32 bits. They are
+represented in two's complement, and they are right shifted arithmetically.
+Values of type unsigned are also 32 bits.
+	We generate arbitrary values x and y, and convert then to unsigned values
+as follows:
+
+int x = random();
+int y = random();
+
+unsigned ux = (unsigned) x;
+unsigned uy = (unsigned) y;
+
+For each of the following C expressions, you are to indicate whether or not
+the expression always yields 1. If it always yields 1, decribe the underlying
+mathematical principles. Otherwise, give an example if arguments that makes it
+yields 0.
+
+-------------------------------------------------------------------------------------------
+Before we get started,
+For every operatation(say @t) that computed in the context of two's complement is defined as:
+
+x @t y := U2T(ux @u uy) = U2T(ux) @t U2T(uy)
+(@t) x := U2T((@u) ux),
+
+In other words, two's complement w-bit form set is isomorphic to unsigned w-bits form one,
+except for properties pertaining to order.
+
+As long as a property is true for an unsigned system, that is also true for 2's complement one.
+(Not related to order property, of course.)
+-------------------------------------------------------------------------------------------
+A. (x < y) == (-x > -y)
+
+False, x = INT_MIN, y = INT_MAX;
+Due to the two's complement representation, INT_MIN = -INT_MIN.
+For other cases A would yield 1.
+
+
+B. ((x + y) << 4) + y - x == 17 * y + 15 * x;
+
+True.
+
+In the Z(integer) ring,
+x << 4 = 16 * x;
+y << 4 = 16 * y;
+(x + y) << 4 = 16 * (x + y);
+
+trivially  16 * x + 16 * y == 16 * (x + y); by the ring property.
+
+Since (16*x + 16*y) mod 2^w == (16 * (x + y)) mod 2^w, by the property of equality,
+	 // In this example, we can learn that unsigned systems have associative, distributive, commutative properties.
+	 // with respect to addition and mulitiplication.
+	 // Actually, The unsigned system is a kind of ring, so is the two' complement one by their isomorphism.
+
+((x + y) << 4) + y - x = U2T(((ux + uy) << 4) + uy - ux)
+					   = U2T((16 * (ux + uy) + uy - ux))
+					   = U2T(17 * uy + 15 * ux)
+	                   = 17 * y + 15 * x
+C. ~x + ~y + 1 == ~(x + y);
+
+True;
+
+~x + ~y + 1 = (-x) + (-y) - 1
+            = -(x + y) - 1
+			= ~(x + y)
+
+D. (ux - uy) == -(unsigned) (y - x)
+True;
+- (unsigned) (y - x) = - (uy - ux) = ux - uy
+
+E. ((x >> 2) << 2) <= x
+True, Whether x is nonnegative or not, the loss of bits except the sign bit
+makes the x not larger than the initial value.
+

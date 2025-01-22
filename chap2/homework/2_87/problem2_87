@@ -1,0 +1,51 @@
+The 2008 versio of the IEEE floating point standard, named IEEE 754-2008,
+includes a 16 bits "half-precision" floating-point format. It was originally
+devised by computer graphics companies for storing data in which a higher 
+dynamic range is required than can be achieved with 16-bit integers. The format
+has 1 sign bit, 5 exponent bits, and 10 fraction bits. The exponent bias is 15.
+Fill in the table that follows for each of the numbers given, with the following
+instructions for each column.
+
+Hex: The four hexadecimal digits is describing the encoded form.
+
+M: The value of the significand. This should be a number of the form x or x/y.
+   where x is an integer and y is an integral power of 2. Examples include 0.
+   67/63, and 1/256.
+
+E: The integer value of the exponent.
+
+V: The numeric value represented. Use the notation x * 2^z, where x and z are
+   integers.
+
+D: The (possibly approximate) numerical value, as is printed using the %f formatting
+   specification of printf.
+
+
+Description				Hex			M			E			V			D
+-----------------------------------------------------------------------------------
+-0					| 0x8000	    0         -14       -0 * 2^(-14)    -0.000000
+Smallest value > 2	| 0x4001    1025/1024       1       1025 * 2^(-9)  2.001953    
+512					| 0x6000        1           9       1 * 2^9        512.000000
+Largest denormalized| 0x03ff    1023/1024     -14       1023 * 2^(-24) 0.000061      
+-infinity			| 0xfc00        1           -           -          -
+0x3bb0(15280)		| 0x7776    955/512        13       955 * 2^4      15280.000000     
+------------------------------------------------------------------------------------
+
+1 00000 0000000000
+1000 0000 0000 0000
+
+0 10000 0000000001
+0100 0000 0000 0000
+
+0 11000 0000000000
+0110 0000 0000 0000
+
+0 00000 1111111111
+0000 0011 1111 1111
+
+1 11111 0000000000
+1111 1100 0000 0000
+
+001 1101110110000
+0 11101 1101110110
+0111 0111 0111 0110

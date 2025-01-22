@@ -1,0 +1,36 @@
+Given a floating-point format with a k-bit exponent and an n-bit fraction,
+write formula for the exponent E, the significand M, the fraction f, and
+the value V for the quantities that follow. In addition, describe the bit
+representation.
+
+A. 7.0f
+B. The largest odd integer that can be represented exactly.
+C. The reciprocal of the smallest positive normalized value.
+
+
+
+A. 
+f = 0b011 (hidden 1)
+M = 0b111 
+E = 127 + 2 = 129 = 0b10000001
+
+V = 0 10000001 11000000000000000000000 = 2^2 + 0b1.11 = 0b111 = 7.0f
+
+
+B.
+f = 0b01111111 11111111 11111111 (hidden 1)
+M = 0b11111111 11111111 11111111
+E = 127 + 23 = 150 = 0b10010110
+
+V = 0 10010110 11111111111111111111111 = 2^23 * (2 - 2^23) = 2^24 - 1
+
+
+C. The smallest positive normalized value:
+0 00000001 00000000000000000000000 = 2^-126,
+
+Reciprocal = 2^126
+f = 0b  0000000 00000000 00000000 (hidden 1)
+M = 0b 10000000 00000000 00000000
+E = 0b01111111 + 0b01111110 = 0b11111101
+V = 0 11111101 00000000000000000000000 = 2^(253 - 127) = 2^126.
+
