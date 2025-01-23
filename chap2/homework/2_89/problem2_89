@@ -28,8 +28,9 @@ where the type double can mount all int types on
 its fraction bits(52 bits.)
 
 B. dx - dy == (double) (x - y)
-Almost true but false due to the case y = INT_MIN,
-dx - dy has no harm for it, but in int type, -y would be just y.
+
+False, when computing x - y, an overflow could occur,
+while computing dx - dy not.
 
 
 C. (dx + dy) + dz == dx + (dy + dz)
