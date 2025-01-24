@@ -1,0 +1,7 @@
+You have been assigned the task of writing a C function to compare a
+floating-point representation of 2^x. You decide that the best way to
+do this is to directly construct  the IEEE single-precision represent-
+ation of the result. When x is too small, it will return +infinity.
+Fill in the blank portions of the code that follows to compute the
+correct result. Assume the function u2f returns a floating-point
+value having identical bit representation as its unsigned argument.

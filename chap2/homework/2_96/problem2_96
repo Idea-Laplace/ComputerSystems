@@ -1,0 +1,17 @@
+Following the bit-level floating-point rules, implement the function with
+the following prototype:
+
+
+/* Compute (int) f.
+ * If conversion casues overflow or f is NaN, return 0x80000000(INT_MIN)
+ */
+
+int float_f2i(float_bits f);
+
+For floating-point number f, this function computes (int) f. Your function
+should round toward zero. If f cannot be represented as an integer, then the
+function should return 0x80000000.
+
+Test your function by evaluating it for all 2^32 values of arguments f and
+comparing the result to what would be obtained using your machine's floating-
+point operations.

@@ -1,0 +1,12 @@
+Following the bit-level floating-point rules, implement the function with
+the following prototype:
+
+
+/* Compute (float) i. */
+
+int float_i2f(int f);
+
+For argument i, this function computes the bit-level representation of (float) i.
+
+Test your function by evaluating it for all 2^32 values of argument i and comparing
+the result to what would be obtained using your machine's floating-point operation.

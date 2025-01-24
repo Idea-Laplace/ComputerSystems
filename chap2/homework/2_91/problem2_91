@@ -1,0 +1,46 @@
+Around 250 B.C., the Greek mathematicain Archimedes proved that 223/71 < pi < 22/7.
+Had he had access to a computer and the standard library <math.h>, he would have
+been able to determine that the single-precision floating-point approximation of pi
+has the hexadecimal representation 0x40490fdb. Of course, all of these are just
+approximations, since pi is not rational.
+
+A: What is the fractional binary number denoted by this floating-point value?
+B: What is the fractional bianry representation of 22/7?
+(Hint: See Problem 2.83)
+C: At what bit position (relative to the binary point) do these two approximations
+to pi diverge?
+
+
+A:
+
+0x40490fdb = 0b 01000000 01001001 00001111 11011011
+= 0 10000000 1001001 00001111 11011011
+
+Binary fraction: 1001001 00001111 11011011
+
+B:
+a/(2^k - 1) = 1/7, we put k = 3, a = 1, then
+(Actually, the formula was a*2^(-k)/(1 - 2^(-k)), which could be simplified
+ written just before.)
+
+1/7 = 0.[001]
+
+3 + 1/7 is 2 + 1.[001], where the exponent is 1, which is represented as 10000000
+when it is adjusted by the bias, 01111111.
+
+Binary fraction: 1[001] = 1001001 00100100 10010010 (trailing series of bits are discarded.)
+
+C:
+
+0x40490fdb
+1001001 00001111 11011011
+22/7
+1001001 00100100 10010010
+
+The 10th bit to the left is the first bit that is different from each other.
+which represents the position bit for 1/512 (1/2^(1 - 10))
+
+
+
+
+

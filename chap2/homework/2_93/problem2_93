@@ -1,0 +1,10 @@
+Following the bit-level floating-point coding rules, implement the function with
+the following prototype:
+
+float_bit float_absval(float_bits f);
+
+for floating-point number f, this function computes  |f|. If f is NaN,
+your function should simply return f.
+
+Test your function by evaluating it for all 2^32 values of argument f and comparing
+the result to what would be obtained using your machine's floating-point operations.
