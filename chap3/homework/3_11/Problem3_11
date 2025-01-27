@@ -1,0 +1,27 @@
+It is common to find assembly-code of the form
+
+xorq %rcx, %rcx
+
+in code that was generated from C where no exclusive-or operations were present.
+
+A. Explain the effect of this particular exclusive-or instruction and what useful
+   operation it implements.
+
+   Ans) x ^ x = 0 always. So maybe an expression like x = 0; would adopt this
+   		implementation, which would have been movq $0, %rcx.
+
+B. What would be the mor straightward way to express this operation in assembly code?
+	
+	Ans) As mentioned in A, it would be movq $0, %rcx.
+
+C. Compare the number of bytes to encode any two of these three diffetent implementation
+	of the same operation.
+
+	Ans) Assembling and disassembling this code, however, we find that the version with xorq
+	requires only 3 bytes, while the version with movq requires 7. Other ways to set %rcx to
+	zero rely on the property that any instruction that updates the lower 4 bytes will causes
+	the high-order bytes to be set zero. Thus, we could use either xorl, %ecx, %ecx (2 bytes) or
+	movl $0, %ecx (5 bytes)
+
+	*x86-64 adopted the convention that any instruction that generates a 32-bit value for
+	a register also sets the high-order portion of the register to 0.

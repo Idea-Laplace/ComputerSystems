@@ -1,0 +1,10 @@
+Suppose register %rbx holds value p and %rdx holds value q.
+Fill in the table below with formulas indicating the value that
+will be stored in register %rax for each of the given assembly-code instruction:
+
+leaq 9(%rdx), %rax			: 9 + q
+leaq (%rdx, %rbx), %rax		: q + p
+leaq (%rdx, %rbx, 3), %rax	: q + 3p
+leaq 2(%rbx, %rbx, 7), %rax : 2 + 8p
+leaq 0xe(, %rdx, 3), %rax	: 14 + 3q
+leaq 6(%rbx, %rdx, 7), %rax : 6 + p + 7q

@@ -1,19 +1,22 @@
-	.file	"prob3_3.c"
+	.file	"3_5.c"
 	.text
-	.globl	main
-	.type	main, @function
-main:
+	.globl	decode1
+	.type	decode1, @function
+decode1:
 .LFB0:
 	.cfi_startproc
 	endbr64
-	movsbl	0, %eax
-	movl	%eax, 0
-	movl	$0, %eax
+	movq	(%rdi), %r8
+	movq	(%rsi), %rcx
+	movq	(%rdx), %rax
+	movq	%r8, (%rsi)
+	movq	%rcx, (%rdx)
+	movq	%rax, (%rdi)
 	ret
 	.cfi_endproc
 .LFE0:
-	.size	main, .-main
-	.ident	"GCC: (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0"
+	.size	decode1, .-decode1
+	.ident	"GCC: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0"
 	.section	.note.GNU-stack,"",@progbits
 	.section	.note.gnu.property,"a"
 	.align 8

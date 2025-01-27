@@ -1,18 +1,21 @@
-	.file	"exchange.c"
+	.file	"3_10.c"
 	.text
-	.globl	exchange
-	.type	exchange, @function
-exchange:
+	.globl	arith3
+	.type	arith3, @function
+arith3:
 .LFB0:
 	.cfi_startproc
 	endbr64
-	movq	(%rdi), %rax
-	movq	%rsi, (%rdi)
+	movl	%esi, %eax
+	orl	%esi, %edx
+	sarw	$9, %dx
+	notl	%edx
+	subl	%edx, %eax
 	ret
 	.cfi_endproc
 .LFE0:
-	.size	exchange, .-exchange
-	.ident	"GCC: (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0"
+	.size	arith3, .-arith3
+	.ident	"GCC: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0"
 	.section	.note.GNU-stack,"",@progbits
 	.section	.note.gnu.property,"a"
 	.align 8

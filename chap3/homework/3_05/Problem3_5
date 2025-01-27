@@ -1,0 +1,36 @@
+You are given yhr following information. A function with prototype:
+
+void decode1(long *xp, long *yp, long *zp);
+
+is compiled into assembly code, yielding the following:
+
+decode1:
+movq	(%rdi), %r8
+movq	(%rsi), %rcx
+movq	(%rdx), %rax
+movq	%r8, (%rsi)
+movq	%rcx, (%rdx)
+movq	%rax, (%rdi)
+ret
+
+Parameters xp, yp, and zp are stored in registers %rdi, %rsi, and %rdx, respectively.
+Write C code for decode1 that will have an effect equivalent to the assembly code shown.
+
+
+movq	(%rdi), %r8 	// Store the value *xp in %r8
+movq	(%rsi), %rcx 	// Store the value *yp in %rcx
+movq	(%rdx), %rax	// Store the value *zp in %rax
+movq	%r8, (%rsi)		// Copy value in %r8(initial *xp) into %rsi(yp)
+movq	%rcx, (%rdx)	// Copy value in %rcx(initial *yp) into %rdx(zp)
+movq	%rax, (%rdi)	// Copy value in %rax(initial *zp) into %rdi(zp)
+ret
+
+void decode1(long *xp, long *yp, long *zp) {
+	long x = *xp, y = *yp, z = *zp;
+
+	*yp = x;
+	*zp = y;
+	*xp = z;
+
+	return;
+}

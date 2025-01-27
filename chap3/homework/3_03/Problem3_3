@@ -1,0 +1,15 @@
+Each of the following lines of code generates an error message when
+we invoke the assembler. Explain what is wrong with each line.
+
+A. movb $0xf, (%ebx)  --> movb $0xf, (%rbx)  // %eax cannot contain address due to its 32-bit size, where addresses are of 64-bit.
+B. movl %rax, (%rsp)  --> movq %rax, (%rsp)  // Values in %rax is 8-byte long.
+C. movw (%rax), 4(%rsp) --> movw %rax, 4(%rsp) OR mov (%rax), %rsp 
+// x86-64 imposes the restriction that a move instruction cannot have both operands refer to memory location.
+
+D. movb %al, %sl --> movb %al, %sil OR movb %al, %spl
+// There is no register name of which is sl. si: source index, sp: stack pointer
+
+E. movq %rax, $0x123 --> movq $0x123, %rax // Immediate values cannot be destination locations.
+F. movl %eax, %dx  --> movl %eax, %rdx OR movl %eax, %edx // Destination operand with incorrect size.
+G. movb %si, 8(%rbp) --> movw %si, 8(%rbp) OR movb %sil, 8(%rbp)
+// Mismatch between instruction suffix and register ID

@@ -1,0 +1,32 @@
+Assume variable sp and dp are declared with types
+
+src_t *sp;  // source type
+dest_t *dp; // destination type
+
+where src_t and dest_t are data types declared with typedef. We wish to use the
+appropriate pair of data movement instruction to implement the operation
+
+*dp = (dest_t) *sp;
+
+Assume that the values of sp and dp are stored in registers %rdi and %rsi,
+respectively. For each entry in the table, show the two instructions that
+implement the specified data movement. 
+The first instruction in the sequence should read from memory, do the appropriate conversion, and set the appropriate
+portion of register %rax.
+The second instruction should then write the appropriate portion of %rax to momory.
+In both cases, the portions may be %rax, %eax, %ax or %al, and they may differ from one another.
+
+Recall that when performing a cast that involves both a size change and a change of
+'signedness' in C, the operation should change the size first (Section 2.2.6.)
+
+Assume that the type char is signed char.
+
+src_t			dest_t			Instruction1			Instruction 2
+------------------------------------------------------------------------------
+long			long			movq (%rdi), %rax 		movq %rax, (%rsi)  // At least one of operands is not a momory reference.
+char			int				movsbl (%rdi), %eax		movl %eax, (%rsi)
+char			unsigned		movsbl (%rdi), %eax		movl %eax, (%rsi)  // Size coversion first. 
+unsigned char 	long			movzbl (%rdi), %rax		movq %rax, (%rsi)
+int				char			movl (%rdi), %eax		movb %al, (%rsi)   // Destination size should equal to or larger than that of instruction suffix.
+unsigned 		unsigned char	movl (%rdi), %eax		movb %al, (%rsi)
+char			short			movsbw (%rdi), %ax		movw %ax, (%rsi)

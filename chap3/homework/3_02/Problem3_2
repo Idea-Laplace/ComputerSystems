@@ -1,0 +1,20 @@
+For each of the following lines of assembly language, determine the appropriate
+instruction suffix based on the operands.
+
+mov_ %eax, (%rsp)
+mov_ (%rax), %dx
+mov_ $0xff, %bl
+mov_ (%rsp, %rdx, 4), %dl
+mov_ (%rdx), %rax
+mov_ %dx, (%rax)
+
+
+
+
+
+movl %eax, (%rsp)
+movw (%rax), %dx
+movb $0xff, %bl
+movb (%rsp, %rdx, 4), %dl
+movq (%rdx), %rax
+movw %dx, (%rax)

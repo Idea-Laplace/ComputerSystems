@@ -1,0 +1,41 @@
+mov[word_size]
+
+movb   Move one-byte source word to a memory or register
+movw   Move two-byte source word to a memory or register
+movl   Move four-byte source word to a memory or register and clear upper bits to 0.*
+movq   Move eight-byte source word** to a memory or register.
+* The implementation of movl is based on historical reason.
+** If the word is $Immediate, it can only be a number that can be represented as 32-bit two's complement.
+** After moved, then the copied value will go through sign extenstion within the 8-byte destination.
+
+movabsq This operator is used for 8-byte $Imm values due to the limit of movq.
+
+----------------------------------------------------------------------------------------------------
+
+movz[word_size1][word_size2]
+
+movzbw	Move zero-extension byte-to-word 	(1byte to 2bytes.)
+movzbl  Move zero-extension byte-to-double 	(1byte to 4bytes.)
+movzbq  Move zero-extension byte-to-quad 	(1byte to 8bytes.)
+
+movzwl  Move zero-extension word-to-double  (2bytes to 4bytes.)
+movzwq  Move zero-extension byte-to-quad 	(2bytes to 8bytes.)
+
+Note the absence of an explicit instruction to zero-extend a 4-byte source
+value to an 8-byte destination, say, movzlq, which actually the movl takes the role.
+
+----------------------------------------------------------------------------------------------------
+
+movsbw	Move sign-extension byte-to-word 	(1byte to 2bytes.)
+movsbl  Move sign-extension byte-to-double 	(1byte to 4bytes.)
+movsbq  Move sign-extension byte-to-quad 	(1byte to 8bytes.)
+
+movswl  Move sign-extension word-to-double  (2bytes to 4bytes.)
+movswq  Move sign-extension byte-to-quad 	(2bytes to 8bytes.)
+
+movslq  Move sign-extenstion double-to-quad (4bytes to 8bytes.)
+
+cltq										 (%rax <- SignExtend(%eax)) Sign-extend %eax to %rax.*
+
+*This instruction has no operands. it always uses %eax as its source and %rax as the destination for
+the sign-extended result. It has exactly the same effect with movslq %eax, %rax.
