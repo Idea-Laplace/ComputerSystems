@@ -1,0 +1,31 @@
+remdiv:
+	movq %rdx, %r8		// Copy qp
+	movq %rdi, %rax		// Move x to lower 8 bytes of dividend.
+	cqto				// Sign-extend to upper 8 bytes of dividend (%rdx, here)
+	idivq %rsi			// Divide R[%rdx]:R[%rax](dividend) by y.
+	movq %rax, (%r8)    // Store quotient at qp
+	movq %rdx, (%rcx)   // Store remainder at rp
+	ret
+-------------------------------------------------------------------------------
+Consider the following function for computing the quotient and remainder
+of two unsigned 64-bit numbers:
+
+void uremdiv(unsigned long x, unsigned long y,\
+			unsigned long *qp, unsigned long *rp) {
+	unsigned long q = x / y;
+	unsigned long r = x % y;
+
+	*qp = q;
+	*rp = r;
+}
+
+Modify the assembly code shown for signed division to implement this function.
+
+uremdiv:
+	movq %rdx, %r8		
+	movq %rdi, %rax	
+	xorl %edx, %edx		// Zero-extend to %rdx. We can use movq[l] $0, %r[e]dx instead.
+	divq %rsi			// Divide R[%rdx]:R[%rax](dividend) by y, with unsigned division.
+	movq %rax, (%r8)    
+	movq %rdx, (%rcx)  
+	ret

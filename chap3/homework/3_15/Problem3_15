@@ -1,0 +1,59 @@
+In the following excerpts from a disassembled binary, some of the
+information has been replaced by X's. Answer the following questions
+about these instructions.
+
+*PC relative: Program Counter relative - The difference between the address of the
+				target instruction and the address of the instruction following
+				just after the jump(physically) instruction. Difference is given as
+				two's complement type
+
+A. What is the target o fthe je instruction below?
+(You do not need to anything about the callq instruction here.)
+
+	4003fa:		74 02		je		XXXXXX
+	4003fc:		ff d0		callq	*%rax
+
+The instruction address following the jump: 4003fc, [ff, callq]
+Bytes of difference: 0x02
+
+Target instruction address: 0x4003fc + 0x02 = 0x4003fe
+
+
+B. What is the targe of the je instruction  below?
+
+	40042f:		74 f4		je		XXXXXX
+	400431:		5d			pop		%rbp
+
+
+The instruction address following the jump: 400431, [5d, pop]
+Bytes of difference: 0xf4 = -0xc
+Target instruction address: 0x400431 - 0xc = 0x400425
+
+C. What is the address of the ja and pop instruction?
+
+	XXXXXX: 	77 02		ja 		400547
+	XXXXXX:		5d			pop		%rbp
+
+
+Bytes of difference: 02
+Address of the instruction pop: 0x400547 - 0x02 = 0x400545
+Address of the ja instruction : 0x400545 - 0x02 = 0x400543
+
+D. In the code that follows, the jump target is encoded in PC-relative form as a
+   4-byte two's-complement number. The bytes are listed from least significant to
+   most, reflecting the little-endian byte ordering of x86-64. What is the address
+   of the jump target?
+
+	4005e8:	e9 73 ff ff ff	jmpq	XXXXXX
+	4005ed: 90				nop
+
+Bytes of difference: 0xffff73 (little endian)
+Address of the instrction just after the jump instruction: 0x4005ed
+Target instruction address: 0xd005ed + 0xffffff73 = 0x4005ed - 0x8d = 0x400560
+
+
+Anser
+A. 0x4003fe
+B. 0x400425
+C. 0x400543, 0x400545
+D. 0x400560

@@ -1,0 +1,7 @@
+A. Try to calculate 14! with a 32-bit int. Verify whether the computation of 14! overflows.
+
+Ans) Overflow happens, the int type can represent factorial values only upto 12!.
+
+B. What if the computation is done with 64-bit long int?
+
+Ans) Done without overflow, upto 20!.

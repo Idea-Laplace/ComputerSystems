@@ -1,8 +1,4 @@
-long long test(long long x) {
+long test(long x) {
 	x = 0;
 	return x;
-}
-
-int main(void) {
-	return 0;
 }

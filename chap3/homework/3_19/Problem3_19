@@ -1,0 +1,18 @@
+Running on a new processor model, our code required around 45 cycles when
+the branching pattern was random, and around 25cycles when the pattern was
+highly predictable.
+
+A. What is the approximate miss penalty?
+
+Sol) Assume that the 25-cycle given is the time consumed when a given
+	 prediction succeeded. Let p be the probability of misinterpretation,
+	 we can put p = 0.5 form the statement 'when the branching pattern was random'.
+
+	 45 cycle  = 25 cycle + 0.5 * T_penalty
+	 T_penalty = 40 cycle
+
+B. How many cycles would the function require when the branch is misinterpreted?
+
+Sol) T_miss = T_ok = T_penalty
+			= 25 cycle + 40 cycle
+			= 65 cycle

@@ -1,0 +1,36 @@
+Starting C code of the form:
+
+short test(short x, short y) {
+	short val = ___;
+	if (___) {
+		if (___)
+			val = ___;
+		else
+			val = ___;
+	} else if (___)
+		val = ___;
+	return val;
+}
+
+GCC generates the following assembly code:
+
+test:
+	leaq	12(%rsi), %rbx	// val = y + 12;
+	testq	%rdi, %rdi
+	jge		.L2				// if (x < 0) opposite ot jge
+	movq	%rdi, %rbx			
+	imulq	%rsi, %rbx		// val = x * y;
+	movq	%rdi, %rdx
+	orq		%rsi, %rdx		// x | y
+	cmpq	%rsi, %rdi		// x : y 
+	cmovge	%rdx, %rbx		// if (x < y) val = x * y else x | y;
+	ret
+.L2
+	idivq	%rsi, %rdi		// x / y
+	cmpq	$10, %rsi		// y : 10 
+	cmovge	%rdi, %rbx		// if (y >= 10) val = x / y;
+	ret
+
+Fill in the missing expressions in the C code.
+
+

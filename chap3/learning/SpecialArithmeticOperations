@@ -1,0 +1,37 @@
+As we saw in section 2.3, multiplying two 64-bit signed or unsigned integers
+can yield a product that requires 128 bits to represent. The x86-64 instruction
+set provides limited support for operations involving 128-bit numbers. Continuing
+with the naming convention of word, double word, and quad word, Intel refers to
+a 16-byte quantity as an oct word.
+
+------------------------------------------------------------------------------
+Instruction 	Effect									Description
+------------------------------------------------------------------------------
+imulq S			R[%rdx]:R[%rax] <- S * R[%rax]			Signed full multiply (Higher 64 bits in %rdx, lower 64bits in %rax)
+mulq  S			R[%rdx]:R[%rax] <- S * R[%rax]			Unsigned full multiply (Ditto.)
+
+cqto			R[%rdx]:R[%rax] <- SignExtend(R[%rax])	Convert to oct word
+
+idivq S			R[%rdx] <- R[%rdx]:R[%rax]modS			Signed divide (Remainder in %rdx)
+				R[%rax] <- R[%rdx]:R[%rax]/S			Signed divide (Quotient in %rax)
+divq S			R[%rdx] <- R[%rdx]:R[%rax]modS			Unsigned divide (Ditto.)
+				R[%rax] <- R[%rdx]:R[%rax]/S			Unsigned divide (Ditto.)
+------------------------------------------------------------------------------
+
+The imulq instruction has two different forms One for, shown in Earlier, is
+as a member of the IMUL instructio class. In this form, it serves as a 'two
+operand' multiply instruction, generating a 64-bit porduct from two 64-bit
+operands. It implements the operation *(t, 64) and *(u, 64).
+
+Additionally, the x86-64 instruction set includes two different 'one-operand'
+multiply instruction to compute the full 128-bit product of two 64-bit values-
+one for unsigned(mulq) and one for two's complement(imulq) multiplication.
+
+For both of these 2 instructions, one argument must be in register %rax, and the
+other is given as the instruction source operand. The product is then stored in
+registers %rdx(higher order 64bits) and %rax(lower order 64bits). Although the
+name imulq is used fro two distinct muliplication operations, the assembler can
+tell which one is intended by counting the number of operands.
+
+idivq and divq are instructions only of one-operand type, specifically exploit the
+%rax and %rdx register.

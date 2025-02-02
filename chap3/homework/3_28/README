@@ -1,0 +1,35 @@
+The problem 3.28 seems to be erroneous.
+
+I think the code has erreta and updated wrongly.
+So I revised overall code of 3.28 in reference to its solution.
+
+Initial code:
+test_two:
+	movq	$1, %edx
+	movl 	$65, %eax
+.L10
+	movq	%rdi, %rcx
+	andl	$1, %ecx
+	addq	%rax, %rax
+	orq		%rcx, %rax
+	shrq	%rdi
+	addq	$1, %rdx
+	jne		.L10
+	rep; ret
+
+=================================
+
+Revised code:
+
+test_two:
+	movq	$16, %edx
+	movl 	$0, %eax
+.L10
+	movq	%rdi, %rcx
+	andl	$1, %ecx
+	addq	%rax, %rax
+	orq		%rcx, %rax
+	shrq	%rdi
+	subq	$1, %rdx
+	jne		.L10
+	rep; ret

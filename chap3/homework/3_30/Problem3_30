@@ -1,0 +1,55 @@
+In the C function that follows, we have omitted the body of  the switch statement.
+In the C code, the case labels did not span a contiguous range, and some cases had
+multiple labels/
+
+void switch2(short x, short *dest) {
+	short val = 0;
+	switch (x) {
+		...
+	}
+	*dest = val;
+}
+
+In compiling the function, GCC generates the assembly code that follows for the 
+initial part of the procedure, with variable x in %rdi:
+
+swithch2:
+	addq	$2, %rdi
+	cmpq	$8, %rdi
+	ja		.L2
+	jmp		.L4(, %rdi, 8)
+
+It generates the following code for the jump table:
+
+.L4:
+	.quad	.L9
+	.quad	.L5
+	.quad	.L6
+	.quad	.L7
+	.quad	.L2
+	.quad	.L7
+	.quad	.L8
+	.quad	.L2
+	.quad	.L5
+
+Based on this information, answer the following questions:
+
+A. What were the values of the case labels in the switch statement?
+
+void switch2(short x, short *dest) {
+	short val = 0;
+	switch (x) {
+		case -2: ***; break;
+		case -1: case 6: ***;  break;
+		case  0: ***; break;
+		case 1: case 3: ***; break;
+		case 4: ***; break;
+		default: ***; break;
+	}
+	*dest = val;
+}
+
+Ans) -2, -1, 0, 1, 3, 4, 6
+
+B. What cases had multiple labels in the C code?
+Ans) -1 and 6, 1 and 3

@@ -1,0 +1,37 @@
+A function test_one has the following overall structure:
+
+short test_one(unsigned short x) {
+	short val = 1;
+	while (___) {
+		.
+		.
+		.
+	}
+	return ___;
+}
+
+The GCC C compiler generates the following assembly code:
+
+test_one:
+	movl	$1, %eax
+	jmp		.L5
+.L6
+	xorq	%rdi, %rax
+	shrq	%rdi
+.L5
+	testq	%rdi, %rdi
+	jne		.L6
+	xorl	$1, %eax
+	ret
+
+Reverse engineer the operation of this code and then do the following:
+
+A. Determine what loop translation method was used.
+
+Ans) Jump-to-middle method used.
+
+B. Use the assembly code version to fill in the missing parts of the C code.
+C. Describe in English what this function computes.
+
+Check there are odd number of ones in x bit representation.
+Returns 1 if x is of odd parity, 0 otherwise.

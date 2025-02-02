@@ -1,0 +1,8 @@
+Assume the probability of misinterpretation is p, the time to execute the code
+without mispretation is T_ok, and the misinterprediction penalty is T_mp.
+Then the average time to execute the code as a function of p is:
+
+T_max = T_ok + T_mp
+T_avg = (1-p)T_ok + p(T_ok + T_mp) = T_ok + pT_mp.
+
+When p is higher, so is T_avg as predicted.

@@ -1,0 +1,18 @@
+An alternate rule for translating if statement into goto code is as follows:
+
+t = test-expr;
+if (t)
+	goto true;
+else-statement;
+goto done;
+
+true:
+then-statemetn
+
+done:
+
+
+A. Rewrite the goto version of absdiff_se based on this alternate rule.
+B. Can you think of any reasons for choosing one rule over the other?
+
+

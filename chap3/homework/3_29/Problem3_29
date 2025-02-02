@@ -1,0 +1,43 @@
+Executing a continue statment in C causes the program to jump to the
+end of the current loop iteration. The stated rule for translating a
+for loop into a while loop needs some refinement when dealing with 
+continue statements. For example, consider the following code:
+
+/* Example of for loop containing a continue statement */
+/* Sum even numbers between 0 and 9 */
+long sum = 0;
+long i;
+for (i = 0; i < 10; i++) {
+	if (i & 1) continue;
+	sum += 1;
+}
+
+
+A. What would we get if we naively applied our rule for translating the
+   for loop into a while loop? What would be wrong with this code?
+
+// Naive conversion from for to while
+
+long sum = 0;					
+long i;						
+for (i = 0; i < 10; i++) {		|	i = 0;
+	if (i & 1) continue;		|	while (i < 10) {
+	sum += 1;					|		if (i & 1) continue;
+}								|		sum += 1;
+								|		i++;
+								|	}
+
+In naive translation, the variable 'i' would never be updated, so we get a never-ending loop.
+
+B. How could you replace the continue statement with a goto statement to ensure that the
+   while loop correctly deuplicate the behavior of the for loop?
+
+// Revised conversion from for to while
+
+for (i = 0; i < 10; i++) {		|	i = 0;
+	if (i & 1) continue;		|	while (i < 10) {
+	sum += 1;					|		if (i & 1) goto update;
+}								|		sum += 1;
+								|	update:
+								|		i++;
+								|	}

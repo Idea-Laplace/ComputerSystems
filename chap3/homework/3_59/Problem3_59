@@ -1,0 +1,73 @@
+The following code computes the 128-bit product of two 64-bit signed
+values x and y and stores the result in memory:
+
+typedef __int128 int128_t;
+
+void store_prod(int128_t *dest, int64_t x, int64_t y) {
+	*dest = x * (int128_t) y;
+}
+
+GCC generates the following assembly implementing the computation:
+
+store_prod:
+	movq	%rdx, %rax
+	cqto
+	movq	%rsi, %rcx
+	sarq	$63, %rcx
+	imulq	%rax, %rcx
+	imulq	%rsi, %rdx
+	addq	%rdx, %rcx
+	mulq	%rsi
+	addq	%rcx, %rdx
+	movq	%rax, (%rdi)
+	movq	%rdx, 8(%rdi)
+	ret
+
+This code uses three multiplications for the multiprecision arithmetic required
+to implement 128-bit arithmetic on a 64-bit machine. Describe the algorithm used
+to compute the product, and annotate the assembly code to show how it realizes
+your algorithm
+
+Hint: When extending arguments of x and y to 128 bits, they can rewritten as
+x = (2^64)x_h + x_l and y = (2^64)y_h + y_l, where x_h, x_l, y_h, y_l are 64-bit
+values. Similarly, the 128-bit product can be written as p = (2^64)p_h + p_l,
+where p_h and p_l are 64-bit values. Show how the code computes the values of 
+p_h and p_l in terms of x_h, x_l, y_h, and y_l.
+------------------------------------------------------------------------------------
+
+store_prod:
+	movq	%rdx, %rax		: Store the value y in %rax   ----  y_l in %rax
+	cqto					: Sign extension of y to %rdx ----  y_h in %rdx
+	movq	%rsi, %rcx		: Copy the value x in %rcx 	  ----  x_l in %rcx
+	sarq	$63, %rcx		: Extraction of the sign bits of x within %rcx, actually it is x_h. ---- x_h in %rcx
+	imulq	%rax, %rcx		: %rcx = x_h * y_l
+	imulq	%rsi, %rdx		: %rdx = y_h * x_l
+	addq	%rdx, %rcx		: %rcx = (x_h * y_l) + (y_h * x_l)
+	mulq	%rsi			: %rdx:%rax = x_l * y_l
+	addq	%rcx, %rdx		: %rdx += (x_h * y_l) + (y_h * x_l)
+	movq	%rax, (%rdi)	: *dest = x_l * y_l [= p_l]
+	movq	%rdx, 8(%rdi)	: *dest = x_l * y_l + (x_l * y_h + x_h * y_l) [= p_l + p_h]
+	ret
+
+------------------------------------------------------------------------------------
+
+		%rdi	%rsi		%rdx			%rax	%rcx
+------------------------------------------------------------
+init.	dest	x_l			y_l				 -		 -
+1		dest	x_l			y_l				y_l					// Moved y_l to exploit 128-bit multiplication.
+2		dest	x_l			y_h				y_l					// Sign extension, the initial y_l in %rdx as 3rd argument replaced.
+3		dest	x_l			y_h				y_l		x_l			// Copied x_l to make x_h from x_l 
+4		dest	x_l			y_h				y_l		x_h			// Created x_h from x_l by arithmetic rightshift. 
+5		dest	x_l			y_h				y_l		x_h*y_l		// A part of p_h, x_h * y_l in %rcx
+6		dest	x_l			y_h*x_l			y_l		x_h*y_l		// A part of p_h, x_l * y_h in %rdx
+7		dest	x_l		y_h*x_l+x_h*y_l		y_l		x_h*y_l		// A part of p_h, x_h * y_l + x_l * y_h
+8		dest	x_l 		p_h				p_l		x_h*y_l		// p_l and p_h computed.
+------------------------------------------------------------
+9		*dest = p_l												// The lower 64-bit are stored in less address.
+10      *dest = p_l + p_h 										// The upper 64-bit are stored in larger address(little endian).
+
+
+Note that p_h = (y_h*x_l + x_h*y_l + (y_l*x_l // 2^64)) % 2^128
+		  p_l = (x_l * y_l) % 2^64
+
+

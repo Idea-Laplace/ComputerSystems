@@ -1,0 +1,41 @@
+Starting with C code of the form
+
+short test(short x, short y, short z) {
+	short val = ;
+	if () {
+		if ()
+			val = ;
+		else
+			val = ;
+	} else if ()
+		val = ;
+	return val;
+}
+
+
+GCC generates the following assembly code:
+
+test:
+	leaq	(%rdx, %rsi), %rax			val = z + y
+	subq	%rdi, %rax					val -= x;
+	cmpq	$5, %rdx					
+	jle		.L2							z <= 5 ?
+	cmpq	$2, %rsi					
+	jle		.L3							y <= 2 ?
+	movq	%rdi, %rax					val = x
+	idivq	%rdx, %rax					val /= z
+	ret
+.L3:
+	movq	%rdi, %rax					val = x
+	idivq	%rsi, %rax					val /= y
+	ret
+.L2
+	cmpq	$3, %rdx
+	jge		.L4							z >= 3 ?
+	movq	%rdx, %rax					val = z
+	idivq	%rsi, %rax					val /= y
+.L4
+	rep; ret
+
+Fill in the missing expressing in the C code.
+

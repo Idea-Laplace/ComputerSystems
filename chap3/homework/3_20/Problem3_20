@@ -1,0 +1,38 @@
+In the following C function, we have left the definition of operation OP incomplete:
+
+#define OP __________  /* Unknown operator */
+
+short arith(short x) {
+	return x OP 16;
+}
+
+
+When compiled, GCC generates the following assembly code:
+
+arith:
+	leaq	15(%rdi), %rbx
+	testq	%rdi, %rdi
+	cmovns	%rdi, %rbx
+	sarq	$4, %rbx
+	ret
+
+A. What operation is OP?
+
+Ans) /, quotient operator
+
+B. Annotate the code to explain how it works.
+
+Ans)
+arith:
+	leaq	15(%rdi), %rbx       // 0xf + x to %rbx, where 0xf = 16 - 1
+	testq	%rdi, %rdi			 // Tests if x is negative or not.
+	cmovns	%rdi, %rbx			 // If x is nonnegative, store x itself.
+	sarq	$4, %rbx             // Arithmetic right 4 shifts to %rbx
+	ret
+
+The assembly code is equivalent to the C code x < 0 ? x + 15 : x;
+Note that Implementation quotient operator with arithmetic right shift operator requires
+a sign test for a given dividend, If a dividend is negative, the bias should be added,
+which is 15 in this problem in which the amount of shift is 4 and 2^4 - 1 = 15. 0b1111
+Since in C, the quotient operator returns quotients with truncate-toward-zero principle,
+such bias is needed(See chapter2).

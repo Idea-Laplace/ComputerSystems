@@ -1,0 +1,34 @@
+1	movq	%rdi, %rax
+2	jmp		.L2
+3 .L3:
+4	sarq	%rax
+5 .L2:
+6	testq	%rax, %rax
+7	jg		.L3
+8	rep; ret	
+
+
+1	0:	48 89 f8		mov		%rdi, %rax
+2	3:	eb 03			jmp		8 <loop+0x8>
+3	5:	48 d1 f8		sar		%rax
+4	8:	48 85 c0		test	%rax, %rax
+5	b:	7f f8			jg		5 <loop+0x5>
+6	d:	f3 c3			repz retq
+
+Line 8 of the assembly code shown above contains the instruction rep; ret.
+These are rendered in the diassembled code as repz and retq. One can infer
+that repz is a synonym for rep, just as retq is synonym for ret. Looking at
+the Intel and AMD documentation for the rep instruction, we find that it is
+normally used to implement a repeating string operation. It seems completely
+inappropriate here. The answer to this puzzle can be seen in AMD's guidelines
+to compiler writers. They recommend using the combination of rep followed by
+ret to avoid making the ret instruction the destination of a conditional jump
+instruction(The first instruction to designated label).
+Without the rep instruction, the jg instruction(line 7) would proceed to the
+ret instruction when the branch is not taken(branch not taken: condition false)
+According to AMD, their processors cannot properly predict the destination of a
+ret instruction when it is reached from a jump instruction. The rep instrunction
+serve as a form of no-operation here, and so inserting it as the jumpm destination
+does not change behavior of the code, except to make it faster on AMD processors. 
+We can safely ignore any rep or repz instuction we see in the rest of the code
+presented in CSAPP 3E book.

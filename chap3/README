@@ -24,3 +24,4 @@ To inspect the contents of machine-code lines, a class of programs known as disa
 can be invaluable.
 
 With linux systems, the program objdump can serve this  role given the -d command line flag.
+The 'd' stands for the word 'disassemble'.

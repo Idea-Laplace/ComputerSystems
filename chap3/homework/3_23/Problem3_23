@@ -1,0 +1,49 @@
+For the C code 
+
+short dw_loop(short x) {
+	short y = x / 9;
+	short *p = &x;
+	short n = 4 * x;
+
+	do {
+		x += y;
+		*p += 5;
+		n -= 2;
+	} while (n > 0);
+
+	return x;
+}
+
+Gcc generates the following assmbly code:
+
+dw_loop:
+	movq	%rdi, %rbx			// Changes the register to hold x from %rdi to %rbx
+	movq	%rdi, %rcx 		    // %rcx holds y. 
+	idivq	$9, %rcx			// y = x / 9;
+	leaq	(, %rdi, 4), %rdx	// n = 4 * n;
+.L2
+	leaq	5(%rbx, %rcx), %rbx	// x += y + 5;
+	subq	$2, %rdx			// n -= 2;
+	testq	%rdx, %rdx			// Updates SF and ZF
+	jg		.L2					// if (n > 0) goto .L2;
+	rep; ret;					// return x;
+
+A. Which registers are used to hold program values x, y, and n?
+
+Ans) 
+x: First %rdi, then %rbx
+y: %rcx
+n: %rdx
+
+B. How has the compiler eliminated the need for pointer variable p
+   and the pointer dereferencing implied by the expression *p += 5?
+
+Ans)
+   *p += 5 is equivalent to x += 5, since p = &x.
+   Hence changing *p += 5 to x += 5, then merge this statement with x += y above will do.
+   x += y + 5 eventually, which is represented as leaq 5(%rcx, %rbx) %rbx.
+
+C. Add annotations to the assembly code describing the operation of
+   the program, similar to those shown in Figure 3.19(c)
+
+Ans) See the above code.
