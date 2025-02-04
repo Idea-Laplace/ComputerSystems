@@ -1,0 +1,28 @@
+For a C function having the general structure:
+
+long rfun(unsigned long x) {
+	if (___)
+		return ___;
+	unsigned long nx = ___;
+	long rv = rfun(nx);
+	return ___;
+}
+
+GCC generates the following assembly code:
+
+rfun:
+	pushq	%rbx
+	movq	%rdi, %rbx
+	movl	$0, %eax
+	testq	%rdi, %rdi
+	je		.L2
+	shrq	$2, %rdi
+	call	rfun
+	addq	%rbx, %rax
+.L2
+	popq	%rbx
+	ret
+
+A. What value does rfun store in the callee-saved register %rbx?
+	Ans: x
+B. Fill in the missing expression in the C code shown above?
