@@ -1,0 +1,63 @@
+Answer the following for the structure declaration
+
+struct {
+	int *a;
+	float b;
+	char c;
+	short d;
+	long e;
+	double f;
+	int g;
+	char *h;
+} rec;
+
+A. What are the byte offsets of all the fields in the structure?
+
+0   4   8   12  16  20  24  28  32  36  40  44
+------------------------------------------------
+aaaaaaaabbbbc*ddeeeeeeeeffffffffgggg****hhhhhhhh
+
+Offset
+a: 0
+b: 8
+c: 12
+d: 14
+e: 16
+f: 24
+g: 32
+h: 40
+
+B. What is the total size of the structure?
+
+Ans) 48 bytes.
+
+C. Rearrange the fields of the structure to minimize wasted space, and
+   then show the byte offsets and total size for the rearranged structure.
+
+struct {
+	int g;
+	float b;
+	long e;
+	double f;
+	int *a;
+	char *h;
+	short d;
+	char c;
+} rec_opt;
+
+0   4   8   12  16  20  24  28  32  36  40  44
+------------------------------------------------
+ggggbbbbeeeeeeeeffffffffaaaaaaaahhhhhhhhddc
+
+
+Offset
+g: 0
+b: 4
+e: 8
+f: 16
+a: 24
+h: 32
+d: 40
+c: 42
+
+Total 43 bytes, 5 byte saved, however, the total size should be 48 byte.

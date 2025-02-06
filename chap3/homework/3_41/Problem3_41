@@ -1,0 +1,47 @@
+Consider the following structure declaration:
+
+struct test {
+	short *p;
+	struct {
+		short x;
+		short y;
+	} s;
+	struct test *next;
+};
+
+This declaration illustrates that one structure can be embedded within another,
+just as arrays can be embedded within structures and arrays can be embedded within
+arrays.
+
+The following procedure (with some expressions omitted) operaates on this
+structure:
+
+void st_init(struct test *st) {
+	st->s.y = ___;
+	st->p = ___;
+	st->next = ___;
+}
+
+A. What are the offsets (in bytes) of the following fields?
+
+p: 0
+s.x: 8
+s.y: 10
+next: 12
+
+B. How many total bytes does the structure requires?
+
+8 + (2 + 2) + 8 = 20 (byte);
+
+C. The compiler generates the following assembly code for st_init:
+
+st_init:
+	movl	8(%rdi), %eax
+	movl	%eax, 10(%rdi)
+	leaq	10(%rdi), %rax
+	movq	%rax, (%rdi)
+	movq	%rdi, 12(%rdi)
+	ret
+
+On the basis of this information, fill in the missing expression in the code for st_init;
+

@@ -1,0 +1,29 @@
+The following C code sets the diagonal elements of one of our fixed-size arrays
+to val:
+
+#define N 16
+
+typedef int fix_matrix[N][N];
+/* Set all diagonal elements to val */
+void fix_set_diag(fix_matrix A, int val) {
+	long i;
+	for (i = 0; i < N; i++)
+		A[i][i] = val;
+}
+
+When compiled with optimization level -O1, Gcc generates the following
+assembly code:
+
+fix_set_diag:
+	movl	0$, %eax
+.L13:
+	movl	%esi, (%rdi, %rax)
+	addq	$68, %rax
+	cmpq	$1088, %rax
+	jne		.L13
+	rep; ret
+
+Create a C code program fix_set_diat_opt that uses optimization similar to
+those in the assembly code, in the same style as the code in Figure 3,37(b).
+Use expressions involving the parameter N rather than integer constants, so
+that your code will work correctly if N is redefined.

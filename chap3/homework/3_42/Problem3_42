@@ -1,0 +1,28 @@
+The following code shows the declaration of a structure of type ACE
+and the prototype fro a function test:
+
+struct ACE {
+	short v;
+	struct ACE *p;
+};
+
+short test(struct ACE *ptr);
+
+
+When the code for fun is compiled, GCC generates the following assembly
+code:
+
+test:
+	movl	$1, %eax
+	jmp		.L2
+.L3
+	imulq	(%rdi), %rax
+	movq	2(%rdi), %rdi
+.L2
+	testq	%rdi, %rdi
+	jne		.L3
+	rep; ret
+
+A. Use your reverse engineering skills to write C code for test.
+B. Describe the data structure that this structure implements and the
+   operation performed by test. 

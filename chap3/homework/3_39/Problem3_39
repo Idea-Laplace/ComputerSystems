@@ -1,0 +1,67 @@
+Use Equation 3.1 :
+
+&array[i][j] = x_p + L * (C * i + j), where
+x_p: address of array
+L: size of base data
+C: size of column
+
+to explain how the computations of the initial values for Aptr,
+Bptr, and Bend in the code of Figure 3.37(b) correctly describe their
+computations in the assembly  code generated for fix_prod_ele(lines 3-5)
+
+----------------------------------------------------------------------------
+#define N 16
+
+typedef int fix_matrix[N][N];
+
+/* Compute i, k of fixed matrix product */	|	// Equivalent assembly code
+int fix_prod_ele_opt(fix_matrix A,\			|	fix_prod_ele:
+	fix_matrix B, long i, long k) {			|		salq	$6, %rdx
+											|		addq	%rdx, %rdi
+	int *Aptr = &A[i][0];					|		leaq	(%rsi, %rcx, 4), %rcx
+	int *Bptr = &B[0][k];					|		leaq	1024(%rcx), %rsi
+	int *Bend = &B[N][k];					|		movl	$0, %eax
+	int result = 0;							|	.L7:
+											|		movl	(%rdi), %edx
+	do {									|		imull	(%rcx), %edx
+		result += *Aptr + *Bptr;			|		addl	%edx, %eax
+		Aptr++;								|		addq	$4, %rdi
+		Bptr += N;							|		addq	$64, %rcx
+	} while (Bptr != Bend)					|		cmpq	%rsi, %rcx
+	return result;							|		jne		.L7
+}											|		rep; ret
+
+
+With referenct to Equation 3.1, each ptr is computed as
+&A[i][0] = A + L(C*i + j);
+&B[0][k] = B + L(C*0 + k);
+&B[N][k] = B + L(C*N + k);
+
+L = sizeof(int) = 4,
+C = N = 16;
+
+Hence the actual computation would be like the following:
+
+&A[i][0] = A + 4(16*i + 0) = A + 64*i			: A + (i << 6)		...(1)
+&B[0][k] = B + 4(16*0 + k) = B + 4*k			: B + 4*k			...(2)
+&B[N][k] = B + 4(16*16 + k) = B + 1024 + 4*k	: B + 1024 + 4*k	...(3)
+
+(1) 
+	A				 : %rdi
+	i				 : %rdx
+	(i << 6) 		 : salq  $6, %rdx
+	A + (i << 6)	 : addq  %rdx, %rdi
+
+(2)
+	B				 : %rsi
+	k				 : %rcx
+	B + 4*k			 : leaq (%rsi, %rcx, 4), %rcx
+
+(3)
+	B				 : %rsi
+	B + 4*k			 : %rcx
+	B + 4*k + 1024	 : leaq	1024(%rcx), %rsi
+
+%rdi: Aptr
+%rsi: Bend
+%rcx: Bptr

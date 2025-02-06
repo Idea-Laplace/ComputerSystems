@@ -1,0 +1,20 @@
+// It seems to be error in solution.
+
+For each of the following strcuture declarations, determine the offset of each
+field, the total size of the structure, and its alignment requirement for x86-64:
+
+struct P1 {short i; int c; int *j; short *d;};
+struct P2 {int i[2]; char c[8]; short s[4]; long *j;};
+struct P3 {long w[2]; int *c[2];};
+struct P4 {char w[16]; char *c[2];};
+struct P5 {struct P4 a[2]; struc P1 t;};
+
+// Numbers enclosed by parentheses denote width of padding.
+-----------------------------------------------------------------
+Type	offset		total size				alignment requirement
+-----------------------------------------------------------------
+P1		0 4 8 16 		24					.align 8
+P2		0 8 16 24		32					.align 8
+P3		0 16			32					.align 8
+P4		0 16			32					.align 8
+P5		0 64			88					.align 8
