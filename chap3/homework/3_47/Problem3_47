@@ -1,0 +1,24 @@
+Running our stack-checking code 10,000 times on a system Linux version 2.6.16,
+we obtained addresses ranging form a minimum of 0xffffb754 to a maximum of
+0xffffd754.
+
+A. What si the approximate range of addresses?
+
+ 0xffffd754
+-0xffffb754
+-----------
+ 0x00002000, 8192 in decimal
+
+ Address can be differ by about 8,200 byte
+
+ B. If we attempted a buffer overrun with a 128-byte nop sled, about how
+ many attempts would it take to test all starting addresses?
+
+ 8192 byte = 2^13 byte
+ 128 byte  = 2^7 byte
+
+ 13 - 7 = 6, 2^6 = 64.
+
+ Even in the worst case, 64 times of attak would successfully corrupt the target.
+
+ 

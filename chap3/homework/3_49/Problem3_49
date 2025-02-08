@@ -1,0 +1,145 @@
+In this problem, we will explore the logic behind the code in lines 5-11 of
+Figure 3.43(b), where space is allocated for variable-size p. As the annotations
+of the code indicates, let us let s1 denote the address of the stack pointer after
+executing the subq instruction of line 4. This instruction allocates the space for
+local variable i. Let s2 denote theh value of the stack pointer after executing
+the subq instruction of line 7. This instruction allocates the stroage for local
+array p.
+The right-hand side of Figure 3.44 diagrams the positions of the locations
+indicated by s1, s2 and p. It also shows that there may be an offset of e2 bytes
+between the values of s1 and p. It also show that there may be an offset of e2 bytes
+between the end of array p and the position indicated by s1.
+
+(a) C code
+long vframe(long n, long idx, long *q) {
+	long i;
+	long *p[n];
+	p[0] = &i;
+	for (i = 1; i < n; i++)
+		p[i] = q;
+	return *p[idx];
+}
+
+(b) Portions of generated assembly code
+
+vframe:
+	pushq	%rbp
+	movq	%rsp, %rbp			// Stores current stack pointer (offset = 0)
+	subq	$16, %rsp			// Allocate space for i (%rsp = s1)
+	leaq	22(,%rdi, 8), %rax
+	andq	$-16, %rax
+	subq	%rax, %rsp
+	leaq	7(%rsp), %rax
+	shrq	$3, %rax
+	leaq	0(, %rax, 8), %r8
+	movq	%r8, %rcx
+
+	// Code for initialization loop
+	// i in %rax and on stack, n in %rdi, p in %rcx, q in %rdx
+.L3:
+	movq	%rdx, (%rcx, %rax, 8)
+	addq	$1, %rax
+	movq	%rax, -8(%rbp)
+.L2
+	movq	-8(%rbp), %rax
+	cmpq	%rdi, %rax
+	jl		.L3
+
+	...
+	// Code for function exit
+	leave			restore %rbp and %rsp
+	ret
+
+Figure 3.44
+
+----------------
+Return address
+================ 0
+Saved %rbp
+---------------- -8
+i
+---------------- -16 <----%rbp(s1)
+(Unused area)
+---------------- -24
+						e1 offset
+---------------- 
+.
+.
+.
+p (8n bytes)
+.
+.
+.
+----------------
+						e2 offset
+----------------   <----%rsp(s2)
+
+
+
+A. Explain, in mathematical terms, the logic in the computation of s2 on lines
+   5-7.
+   Hint: Think about the bit-level representation of -16 and its effect in the
+   		 andq instruction of line 6.
+
+
+	leaq	22(, %rdi, 8), %rax
+	%rax : 8n + 22
+
+	andq	$-16, %rax
+
+	0xfffffff0 & (8n + 22) : ((8n + 22) // 16) * 16
+	Put n = 2n' + r, where each n' and r is the quotient and the remainder 
+	repectively for n divided by 2.
+    (8n + 22) // 16 = (16n' + 16 + 6 + r) // 16
+	Since r is either 0 or 1, surely 6 + r would be truncated.
+	
+
+	%rax: 16(n//2 + 1) 
+
+	subq	%rax, %rsp: s2  = s1 + 16(n//2 + 1)
+
+	the difference s1 - s2 = 8n + 8 if n were odd else 8n + 16
+
+B. Explain, in mathematical terms, the logic in the computation of p on lines
+   8-10.
+   Hint: You may want to refer to the discussion on division by powers of 2 in Section 2.3.7
+
+   leaq	7(%rsp), %rax
+   %rax: s2 + 0x111
+
+   shrq	$3, %rax
+   %rax : ceil(s2 / 8)
+
+   leaq		0(,%rax, 8), %r8:     8 * ceil(s2/8)
+
+   %r8: 8*ceil(s2/8), s2 if s2 were multiple of 8 else s2 + 8
+   e2 will be 0 if s2 were multiple of 8 else 8.
+   since s2 is equivalent in terms of modulo 8,
+   the above condition is interchangeable btw s1 and s2
+
+
+C. For the following values n and s1, trace the execution of the code to 
+   determine what the resulting values would be for s2, p, and e2
+
+   -----------------------------
+   	r:= s1 % 8		e1		e2
+   n even           8+r 	8-r
+   n odd      		r       8-r
+   -----------------------------
+
+   Decimal
+   n	s1		s2		p		e1		e2
+   ---------------------------------------
+   5	2065	2017	2024	1		7
+   6	2064	2000	2000	16		0
+
+D. What alignment properties does this code guarantee for the values of s2 and p?
+
+The address of p is guaranteed that it is mmultiple of 8, size of the given data type
+s2 is guaranteed that the difference from s1 is larger than 8n, leaving some cushion
+area such as e1 and e2.
+
+8n+8 when n odd makes the difference between s1 and s2 the least 16-times value that
+can contain 8n byte, same argument would be appiled to even case, 8n + 16, not just 8n,
+due to the need for space to adjust the address of p to multiple of 8.
+

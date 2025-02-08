@@ -1,0 +1,61 @@
+Figure 3.41 shows a (low-quality) implementation of a function that
+reads a line from standard input, copies the string to newly allocated
+storage, and returns a pointer to the result.
+	Consider the following scenario. Procedure get_line is called with
+the return address equal to 0x400776 and register %rbx equal to 0x0123456789abcdef.
+You type in the string
+
+0123456789012345678901234
+
+The program terminates with a segmentation fault. You run GDB and determine
+that the error occurs during the execution of the ret instruction of get_line.
+
+A. Fill in the diagram that follows, indicating as much as you can about the stack
+   just after executing the instruction at line 3 in the disassembly. Label the
+   quantities stored on the stack(e.g., "Return address")on the right, and their
+   hexadecimal values(if known) within the box. Each box represents 8 bytes.
+   Indicate the position of %rsp. Recall that the ASCII codes for characters 0-9
+   are 0x30-0x39.
+
+   -----------------------
+   00 00 00 00 00 40 00 76	: Return address
+   -----------------------
+   01 23 45 67 89 AB CD EF  : Value for the Callee-saved register %rbx
+   -----------------------
+   							
+   -----------------------
+							: Address for buffer  <- %rsp
+   -----------------------
+   
+   -----------------------
+
+B. Modify your diagram to show the effect of the call to gets(line 5)
+
+   -----------------------
+   34 00 00 00 00 40 00'34	: Return address
+   -----------------------
+   33 32 31 30 39 38 37 36  : Value for the Callee-saved register %rbx
+   -----------------------
+   35 34 33 32 31 30 39 38
+   -----------------------
+   37 36 35 34 33 32 31 30'	: Address for buffer (little endian, for visual purpose, enclosed by ') 
+   -----------------------
+ 
+   -----------------------
+
+C. To what address does the program attempt to return?
+
+Ans: The program would try to return at address 0x400034, totally different from what it was, 0x400076.
+
+D. What register(s) have corrupted value(s) when get_line returns?
+Ans: (%rbx), a callee saved register that should have been preserved until the get_line returns with this value.
+
+E. Besides the potential for buffer overflow, what two other things are wrong withe code for get_line?
+
+Ans)
+
+The strlen function does not count the '\0' character, which is quite user-friendly but not consistent with
+its actual byte size. So we should revise the given code as result = malloc(strlen(buf) + 1);
+Also, malloc always has chance to fail to allocate memory that have been required, hence we need to add
+error handing code that examines whether the result is NULL or not.
+
