@@ -1,0 +1,41 @@
+The following code transposes the element of an M by M array, where
+M is a constant defined by #define:
+
+void transpose(long A[M][M]) {
+	long i, j;
+	for (i = 0; i < M; i++)
+		for (j = 0; j < i; j++) {
+			long t = A[i][j];
+			A[i][j] = A[j][i];
+			A[j][i] = t;
+		}
+}
+
+When compiled with optimization level -O1, GCC generates the following code
+for inner loop of the function:
+
+.L6:
+	movq	(%rdx), %rcx   // 3. %rcx --> t = A[i][j], %rdx --> A[i][j]  
+	movq	(%rax), %rsi   // 4. %rsi = A[j][i] // %rsi is just a intermediary register between (%rax) and (%rdx),
+						   //    due to the restriction of direct data transfer between memories.
+	movq	%rsi, (%rdx)   // 5. A[i][j] = A[j][i]
+	movq	%rcx, (%rax)   // 6. A[j][i] = A[i][j]
+	addq	$8, %rdx       // 1. We can identify that %rdx points to A[i][j]
+	addq	$120, %rax     // 2. We can identify that %rax points to A[j][i], 120 / 8 = 15, M = 15
+	cmpq	%rdi, %rax     // 7. Probably %rdi would point to A[i][i] in outer loop.
+	jne		.L6
+
+We can see that GCC has converted the array indexing to pointer code.
+
+A. Which register holds a pointer to array element A[i][j]?
+
+Ans) %rdx
+
+
+B. Which register holds a pointer to array element A[j][i]?
+
+Ans) %rax
+
+C. What is the value of M?
+Ans) 120 / 8 = 15, M = 15.
+

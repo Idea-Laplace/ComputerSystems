@@ -1,0 +1,88 @@
+You are charged with maintaining a large C porgram, and you come
+across the following code:
+
+typedef struct {
+	int first;
+	a_struct a[CNT];
+	int last;
+} b_struct;
+
+void test(long i, b_struct *bp) {
+	int n = bp->first + bp->last;
+	a_struct *ap = &bp->a[i];
+	ap->x[ap->idx] = n;
+}
+
+The declarations of the compile-time constant CNT and the structure
+a_struct in a file for which you do not have necessary access privilege.
+Fortuneately, you have a copy of the .o version of code, which you are
+able to disassemble with the 'objdump' program, yielding the following
+disassembly:
+
+0000000000000000 <test>
+  	0:	8b 8e 20 01 00 00		mov		0x120(%rsi), %ecx
+	6:	03 0e					add		(%rsi), %ecx
+	8:	48 8d 04 bf				lea		(%rdi, %rdi, 4), %rax
+	c:	48 8d 04 c6				lea 	(%rsi, %rax, 4), %rax
+	10:	48 8b 50 08				mov 	0x8(%rax), %rdx
+	14:	48 63 c9				movslq	%ecx, %rcx
+	17:	48 89 4c d0 10			mov		%rcx, 0x10(%rax, %rdx, 8)
+	1c:	c3						retq
+
+Using your revers engineering skills, deduce the following:
+
+A. The value of CNT
+B. A complete declaration of structure a_struct. Assume that the only
+   fields in this structure are idx and x, and that both of these contain
+   signed values.
+
+test:
+	mov		0x120(%rsi), %ecx			:n = bp->last
+	add		(%rsi), %ecx				:n += bp->first, sizeof(a_struct) would be less than 0x120
+	lea		(%rdi, %rdi, 4), %rax		:%rax: 5*i
+	lea 	(%rsi, %rax, 8), %rax		:%rax: 40*i + bp
+	mov 	0x8(%rax), %rdx				:%rdx: 8(%rax)
+	movslq	%ecx, %rcx					:sign extension.
+	mov		%rcx, 0x10(%rax, %rdx, 8)	:0x10(%rax, %rdx, 8) = n; 
+	ret
+
+	%rdx: *(bp + 40*i + 0x8)				: &bp->a->idx would be bp + 40*i + 8, with sizeof(a_struct) is 40 byte, or 0x28 byte. 	
+	0x10 + bp + 40*i + 8*(ap->idx)  =  (bp + 0x8 + 20*i) + (0x8) + 8*(ap->idx)
+	
+	Since ap->idx is scaled by 8, the primitive data type for ap->x would be 'long'.
+	Because bp->a comes after bp->first, if ap->x comes earlier than ap->idx, bp->a->idx
+	is at address larger than bp + 12 + 40i, hence ap->idx comes first, along with the
+	offset 0x8 within ap.
+
+	Hence, we might purpose the structure of a_struct:
+
+	typedef struct {
+		long idx;
+		long x[4];
+	} a_struct;
+	
+	If we consider only the total size of a_struct, any signed types such as
+	signed char, short, int, and long can be the type for idx, since padding
+	bytes would automatically be added between idx and x[4] by the alignment
+	requirement.
+	However, mov 	8(%rax), %rdx instruction orders that 8(%rax), which contains
+	the value of idx, should be copied to %rdx directly, not %edx, %dx, or %dl,
+	which implies that the size of a->idx is 8-byte long. Hence the type of idx
+	would be long.
+
+
+
+A. 0x120 = (width of first with padding) + (sizeof(a[CNT]))
+		 = 0x8 + 0x28 * CNT
+	0x118 / 0x28 = CNT
+	280 / 40 = 7.
+	CNT = 7.
+
+B.
+	typedef struct {
+		long idx;
+		long x[4];
+	} a_struct;
+
+
+

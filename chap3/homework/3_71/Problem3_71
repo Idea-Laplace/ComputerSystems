@@ -1,0 +1,10 @@
+Write a function good_echo that reads a line from standard
+input and writes it to standard output. Your implemenatation
+should work for an input line of arbitrary length. You may
+use the library function fgets, but you must make sure your
+function works correctly evne when the input line requires
+more space than you have allocated for your buffer. Your
+code should also check for error conditions and returns when
+one is encountered. Refer to the definition of the standard
+I/O functions for documentation.
+

@@ -1,0 +1,88 @@
+Figure 3.54(a) show tha code for a function that is similar to function vfunct
+(Figure 3.43(a)). We used vfunct to illustrate the use of a frame pointer in 
+managing variable-size stack frames. Teh new function aframe allocates space
+for local array p by calling library function alloca. This function is similar
+to the more commonly used function malloc, except that it allocates space on
+the run-tim stack. The space is automatically deallocated when the executing
+procedure returns.
+
+
+Figure 3.54(b) shows the part of the assembly code that sets up the frame pointer
+and allocates space for local variable i and p. It is very similar to the corresponding
+code for vframe. Let us use the same notation as in Problem 3.49:
+
+The stack pointer is set to values s1 at line 4 and s2 at line 7. Teh start address of
+array p is set to value p at lin 9. Extra space e2 may arise between s2 and p, and
+extra space e1 may arise between the end of array p and s1.
+
+
+Figure 3.54(a)
+#include <alloca.h>
+
+long aframe(long n, long idx, long *q) {
+	long i;
+	long **p = alloca(n * sizeof(long *));
+	p[0] = &i;
+	for (i = 1; i < n; i++)
+		p[i] = q;
+	return *p[idx];
+}
+
+Figure 3.54(b)
+aframe:
+	pushq	%rbp					// To use %rbp, saves the current value in %rbp.
+	movq	%rsp, %rbp  			// Now %rbp acts as the base pointer.
+	subq	$16, %rsp				// Allocate space for i (%rsp = s1)
+	leaq	30(,%rdi,8), %rax		// 8n + 30 to %rax
+	andq	$-16, %rax				// 8n + 16 if n even else 8n + 8.
+	subq	%rax, %rsp				// Allocate space for array p (%rsp = s2)
+	leaq	15(%rsp), %r8			// 15 + s2 at %r8
+	andq	$-16, %r8				// set %r8 to &p[0]
+
+
+A. Explain, in mathematical terms, the logic in the computation of s2.
+	s2 = s1 - 8n - 16		(n is even)
+	s2 = s1 - 8n - 24		(n is odd)
+
+B. Explain, in mathematical terms, the logic in the computation of p.
+	p = round up to the closest multiple of 16 from s2.
+
+C. Find values of n and s1 that lead to minimum and maximum values of e1.
+	p = s2 + e2;
+	s2 - s1 = 8n + e1 + e2;
+	e1 = s2 - s1 - 8n - e2;
+
+	e1 = 16 - e2 (n is even)
+	e1 = 24 - e2  (n is odd)
+
+	e1 ranges from 1 to 16 when n is even.
+	e1 ranges from 9 to 24 when n is odd.
+
+	e1 is 1 when s1 is of (16m + 1) form and n is even.
+	e1 is 24 when s1 is of 16m form and n is odd.
+
+
+D. What alignment properties does this code guarantee for the values of s2 and p?
+
+	p is at an address of multiple of 16.
+
+	s2 is guaranteed that there exist a room to make &p[0] be at a multiple
+	of 16 and &p[n-1] not overwrite bytes over s1.
+
+
+
+	----------------------------------------   <----s1  (16m + r)
+	e1 bytes
+	----------------------------------------   <----s1 - e1
+
+
+	8n byte for p
+
+
+
+	----------------------------------------   <---- p  (s2 + e2)
+	e2 bytes
+	----------------------------------------   <---- s2 (16m' + r)
+
+	e2 byte = 16 - r byte
+

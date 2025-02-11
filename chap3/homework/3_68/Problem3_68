@@ -1,0 +1,53 @@
+In the following code, A and B are constants defined with #define:
+
+typedef struct {
+	int x[A][B];
+	long y;
+} str1;
+
+typedef struct {
+	char array[B];
+	int t;
+	short s[A];
+	long u;
+} str2;
+
+void setVal(str1 *p, str2 *q) {
+	long v1 = q->t;
+	long v2 = q->u;
+	p->y = v1 + v2;
+}
+
+GCC generates the following C code for setVal:
+
+setVal:
+	movslq	8(%rsi), %rax
+	addq	32(%rsi), %rax
+	movq	%rax, 184(%rdi)
+	ret
+
+What are the values of A and B? (The solution is unique.)
+
+	movslq	8(%rsi), %rax 	would be the implementation for v1 = q->t.
+	The address of t is larger than that of q by 8byte,
+	which means 1*B should be larger than 4 and equal to or less than 8,
+	by the alignment requirement.
+
+	4 < B <= 8    ------ (1)
+
+	Next, the address of u is larger than q by 32 byte, larger than t by
+	24 bytes, meaning that 2*A should be larger than 16 and equal to or
+	less than 24 by the alignment requirement.
+
+	8 < A <= 12  ----- (2)
+
+	Finally, the address of y  is larger than p by 184 byte, meaning that
+	4 * A * B should be larger than 176 and equal to or less than 184.
+
+	44 < A * B <= 46 ----- (3)
+
+	A: 9
+	B: 5
+
+	Only this pair fits into these conditions.
+

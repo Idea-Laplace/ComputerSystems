@@ -1,0 +1,78 @@
+Consider the following union declaration:
+
+union ele {
+	struct {
+		long *p;
+		long y;
+	} e1;
+	struct {
+		long x;
+		union ele *next;
+	} e2;
+};
+
+This declaration illustrates that structures can be embedded within unions.
+The following function (with some expressions omitted) operates on a linked
+list having these union as list elements:
+
+void proc(union ele *up) {
+	up->___ = *(___) - ___;
+}
+
+A. What are the offsets(in bytes) of the following fields:
+
+e1.p		: 0
+e1.y		: 8
+e2.x		: 0
+e2.next		: 8
+
+B. How many total bytes does the structure require?
+
+Ans) 16 bytes/
+
+C. The compiler generates the following assembly code for proc:
+
+proc:
+	movq	8(%rdi), %rax
+	movq	(%rax), %rdx
+	movq	(%rdx), %rdx
+	subq	8(%rax), %rdx
+	movq	%rdx, (%rdi)
+	ret
+
+On the basis of this information, fill in the missing expressions in the code
+for proc:
+
+Hint: Some union references can have ambiguous interpretations.
+These ambiguities get resolved as you see where the reference lead. There is
+only one answer that does not perform any casting and does not violate any
+type constraints.
+
+
+proc:
+	movq	8(%rdi), %rax
+	movq	(%rax), %rdx
+   	If 8(%rdi) were interpreted as up->y, it could not derefernced again on next instruction.
+	So, the source operand is up->e2.next.
+	Since %rax contains the address of an union ele, it is also the address of ele.p, or ele.x.
+	As %rdx can store data at most of 8-byte, (%rax) means will be ele.p or ele.x
+	Both ele.p and ele.x are 8-byte long, movq instruction is valid to them all, so we should
+	see next lines to clarify the context of (%rax).
+
+	movq	(%rdx), %rdx
+	Value in %rdx is again dereferenced, so only the ele.p makes sense.
+	now %rdx stores *up->next->e1.p, (For clarity, *(up->e2.next->e1.p) )
+
+	subq	8(%rax), %rdx
+	Now %rdx contains a long type value, so does 8(%rax), up->e2.next->e1.y
+	%rdx: *(up->e2.next->e1.p) - up->e2.next->y
+	
+	movq	%rdx, (%rdi)
+	*(up->e1.x) = *(up->e2.next->e1.p) - up->e2.next->e1.y
+	Since the %rdx is of type long, so is (%rdi), up->e2.x
+
+Ans)
+void proc(union ele *up) {
+	up->e2.x = *(up->e2.next->e1.p) - up->e2.next->e1.y;
+}
+
