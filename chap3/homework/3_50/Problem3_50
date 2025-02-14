@@ -1,0 +1,26 @@
+For the following C code, the expressions val1-val4 all map
+to the program values i, f, d, and l.
+
+double fcvts(int *ip, float *fp, double *dp, long l) {
+	int i = *ip; float f = *fp; double d = *dp;
+	*ip = (int) val1;
+	*fp = (float) val2;
+	*dp = (double) val3;
+	return (double) val4;
+}
+
+Determine theh mapping, based on the following x86-64 code for the function.
+
+fcvt2:
+	movl		(%rdi), %eax			// i = *ip; i reside in %eax
+	vmovss		(%rsi), %xmm0			// f = *fp; f reside in %xmm0 
+	vcvttsd2si	(%rdx), %r8d			// %r8d stores truncated integer(int) from d.
+	movl		%r8d, (%rdi)			// val1: (int) d; *ip = (int) d
+	vcvtsi2ss	%eax, %xmm1, %xmm1		// (float) i;
+	vmovss		%xmm1, (%rsi)			// val2: (float) i; *fp = (float) i;
+	vcvtsi2sdq	%rcx, %xmm1, %xmm1		// (double) l;
+	vmovsd		%xmm1, (%rdx)			// val3: (double) l; *dp = (double) l;
+	vunpcklps	%xmm0, %xmm0, %xmm0		// [-, -, -, f], [-, -, -, f] ----->  [-, -, f, f]
+	vcvtps2pd	%xmm0, %xmm0			// [-, -, f, f] ----> [df, df], val4: (double) f;
+	ret									// return (double) f
+

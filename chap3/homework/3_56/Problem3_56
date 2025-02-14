@@ -1,0 +1,97 @@
+Consider the following C function, where EXPR is a macro defined with #define:
+
+double simplefun(double x) {
+	return EXPR(x);
+}
+
+Below, we show the AVX2 code generated for different definitions of EXPR.
+where value x is held in %xmm0. All of them correspond to some useful operation
+on floating-point values. Identify what the operations are. Your answers will
+require you to understand the bit patterns of the constant words being retrieved
+from memory.
+
+A.
+simplefun:
+	vmovsd	.LC1(%rip), %xmm1
+	vandpd	%xmm1, %xmm0, %xmm0
+.LC1:
+	.long 42949677295
+	.long 2147483647
+	.long 0
+	.long 0
+
+B.
+simplefun:
+	vxorpd	%xmm0, %xmm0, %xmm0
+
+C.
+simplefun:
+	vmovsd	.LC2(%rip), %xmm1
+	vxorpd	%xmm1, %xmm0, %xmm0
+.LC2:
+	.long 0
+	.long -2147483648
+	.long 0
+	.long 0
+
+----------------------------------------------------------------------------
+A.
+.LC1
+4294967295 = UINT_MAX = 0xffffffff
+2147483647 = INT_MAX = 0x7ffffffff
+
+Floating-point constant bit representation:
+0 11111111111 11111....111111111 : The pattern itself is interpreted as nan, but...
+
+vmovsd .LC(%rip), %xmm1
+-> In %xmm1 register, all the lower 8 byte bits are set to 1 but the most significant bit.
+
+vandpd %xmm1, %xmm0, %xmm0
+-> All lower 8 byte bits in %xmm0 are preserved except the sign bit, yielding the absolute value
+   of the floating point number.
+
+Hence,
+
+#define EXPR(x) ((x) > 0 ? (x) : -(x))
+or
+#define EXPR(x) fabs(x)
+under the existence of <math.h> header.
+
+
+----------------------------------------------------------------------------
+B.
+
+vxorpd	%xmm0, %xmm0, %xmm0
+
+Since x ^ x = 0, the above instruction yields 0.0, clearing all bits to 0.
+
+Hence,
+
+#define EXPR(x) 0.0
+
+
+----------------------------------------------------------------------------
+C.
+.LC2
+	0
+	INT_MIN, 0x80000000
+
+Bit representation for the floating-point constant:
+
+1 00000000000 000000...00000, -0.0
+
+vmovsd	.LC2(%rip), %xmm1
+vxorpd	%xmm1, %xmm0, %xmm0
+
+since i ^ 0 = 0 ^ i = i and i ^ 1 = 1 ^ i = (1 - i) for i = 0, 1
+
+The instructions inverse the sign bit of x, yieldint -x.
+
+Hence,
+
+#define EXPR(x) (-(x))
+
+
+Hence,
+
+#define EXPR(x) ((x) = -0.0)

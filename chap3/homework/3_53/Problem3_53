@@ -1,0 +1,38 @@
+For the following C function, the type of the four arguments are
+defined by typedef:
+
+double funct1(arg1_t p, arg2_t q, arg3_t r, arg4_t s) {
+	return p / (q + r) - s;
+}
+
+When compiled, GCC generates the following code:
+
+funct1:
+	vcvtsi2ssq	%rsi, %xmm2, %xmm2
+	vaddss		%xmm0, %xmm2, %xmm0
+	vcvtsi2ss	%edi, %xmm2, %xmm2
+	vdivss		%xmm0, %xmm2, %xmm0
+	vunpcklps	%xmm0, %xmm0, %xmm0
+	vcvtps2pd	%xmm0, %xmm0
+	vsubsd		%xmm1, %xmm0, %xmm0
+	ret
+
+Determine theh possible combinations of types of the four arguments
+(they may be more than one).
+
+funct1:
+	vcvtsi2ssq	%rsi, %xmm2, %xmm2		// Value in %rsi is casted to float, having been of type 8-byte, long type.
+	vaddss		%xmm0, %xmm2, %xmm0		// In C code, the only additive subexpression is q+r, q was in %rsi r was in %xmm0. p is in %r[e]di.
+										// Or converesly, r could be in %rsi and q could be in %xmm0, since addition is commutative.
+	vcvtsi2ss	%edi, %xmm2, %xmm2		// p is casted to float, p was of 4-byte, int type.
+	vdivss		%xmm0, %xmm2, %xmm0		// p / (q + r)
+	vunpcklps	%xmm0, %xmm0, %xmm0		// Since current p / (q + r) is of float type,
+	vcvtps2pd	%xmm0, %xmm0			// it is converted to double type, correspoding to the type of s, double
+										// Since there is no extensions for s, it is sure that s was double at first.
+	vsubsd		%xmm1, %xmm0, %xmm0		// Now in %xmm0, p / (q + r) - s, of type double.
+	ret
+
+
+arg1_t: int
+arg2_t, arg3_t : long, float OR float, long
+arg4_t: double

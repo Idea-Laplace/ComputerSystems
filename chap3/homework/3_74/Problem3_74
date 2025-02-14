@@ -1,0 +1,7 @@
+Write a function in assembly code that matches the behavior of the function
+find_range in Figure3.51. Your code should contain only one floating-point
+comparison instruction, and then it should use conditional moves to generate
+the correct result.
+You might want to make use of the instruction cmovp(move even parity). Test
+your code on all 2^32 possible argument values, Web aside: ASM: EASM on p.214
+describe how to incorporate functions written in assembly code into C programs.

@@ -1,0 +1,60 @@
+ISO C99 includes extensions to support complex numbers. Any floating-point type
+can be modified with the keyword complex. Here are some sample functions that
+work with complex data and call some of the associated library functions:
+
+#include <complex.h>
+
+double c_imag(double complex x) {
+	return cimg(x);
+}
+
+double c_real(double complex x) {
+	return creal(x);
+}
+
+double complex c_sub(double complex x, double complex y) {
+	return x - y;
+}
+
+When compiled, GCC generates the following assembly code for these functions:
+
+c_imag:
+	movapd	%xmm1, %xmm0
+	ret
+c_real:
+	rep; ret
+c_sub:
+	subsd	%xmm2, %xmm0
+	subsd	%xmm3, %xmm1
+	ret
+
+Based on these examples, determine the following:
+
+A. How are complex arguments passed to a function?
+
+Let a complex number c be represented by [x, y], where [x, y] = x + iy, i is the imaginary unit.
+
+x the real part stored in %xmm0, the lower-number xmm register,
+and y the imaginary part stored in %xmm1, the higher-number xmm register.
+When there are more than one complex type parameter, contagious increment of xmm register usage occurs, for example,
+for the 2 paramters x and y for c_sub, let x = [xr, xi], y = [yr, yi].
+Then xr resides in %xmm0, xi resides in %xmm1,
+while yr resides in %xmm2, yi resides in %xmm3.
+
+B. How are complex values returned from a function?
+
+When a return type is just normal-floating number, say, double.
+The lower bytes in %xmm0 would be returned.
+
+When a retrun type is also of complex, The value in %xmm0 is passed as real number part,
+on the other hand, the value in %xmm1 is passed as imagninary part.
+
+c_imag:
+	movapd	%xmm1, %xmm0 		// Now %xmm0 stores imaginary part of x
+	ret							// Return xi
+c_real:
+	rep; ret					// Just returns xr, which was in %xmm0 in the first place.
+c_sub:
+	subsd	%xmm2, %xmm0		// Now %xmm0 stores xr - yr
+	subsd	%xmm3, %xmm1		// Now %xmm1 stores xi - yi
+	ret							// Returns [%xmm0, %xmm1] = [xr - yr, xi - yi] = x - y.
