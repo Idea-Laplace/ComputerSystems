@@ -44,4 +44,31 @@
    x * ~y + ux * uy = T2U(x * (~y + y)) = T2U(-x),
 */
 
+#include <stdio.h>
+#include <limits.h>
+
+int main(void) {
+	// A
+	int a = INT_MIN;
+	printf("x > 0 || x - 1 < 0\n");
+	printf("False.\n");
+	printf("%x(%d) < 0 and %0x(%d) >= 0.\n", a, a, a-1, a-1);
+
+	// C
+	int c = (1 << 16) - 1;
+	printf("c = (1 << 16) - 1\n");
+	printf("%d * %d = %d\n", c, c, c*c);
+
+	// E
+	int x, y;
+	unsigned int ux, uy;
+	x = -1, y = -2;
+	ux = x; uy = y;
+	printf("x= %d, ux=%u\n", x, ux);
+	printf("y= %d, uy=%u\n", y, uy);
+	printf(x+y == ux+uy ? "True\n" : "False\n");
+
+
+	return 0;
+}
 
