@@ -1,0 +1,23 @@
+Reference: https://beej.us/guide/bggdb/
+#My awkward english
+For users to make fully use of functions of gdb, you should add the '-g' option
+when compiling
+
+ex) gcc -g hello.c -o hello
+
+Though one can still use gdb on a file that compiled without '-g',
+You would not exploit many advantages of gdb.
+
+When you are to add your own setting on gdb, just add lines in ~/.gdbinit.
+
+-----------------------------
+#GPT version
+
+To fully benefit from gdb’s debugging features, you should compile your program with the -g option.
+
+Example:
+gcc -g hello.c -o hello
+
+While it is still possible to use gdb with a program compiled without -g, most of the useful debugging information—such as source code lines and variable names—will not be available.
+
+

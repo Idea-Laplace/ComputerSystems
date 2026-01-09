@@ -1,0 +1,31 @@
+Determine the byte encoding of the Y86-64 instruction
+that follows. The line .pos 0x100 indicates that the starting
+address of the object code should be 0x100.
+
+.pos 0x100 # Start code at address 0x100.
+	irmovq $15, %rbx
+	rrmovq %rbx, %rcx
+.loop
+	rmmovq %rcx, -3(%rbx)
+	addq %rbx, %rcx
+	jmp loop
+
+----------------------------------------------------
+4_1code.yo:
+----------------------------------------------------
+
+0x100:                      | .pos 0x100
+0x100: 30f30f00000000000000 | 	irmovq $15, %rbx
+0x10a: 2031                 | 	rrmovq %rbx, %rcx
+0x10c:                      | loop:
+0x10c: 4013fdffffffffffffff | 	rmmovq %rcx, -3(%rbx)
+0x116: 6031                 | 	addq %rbx, %rcx
+0x118: 700c01000000000000   | 	jmp loop	
+
+0x100:                         | .pos 0x100
+0x100: 30 f 3 0f00000000000000 | 	irmovq $15, %rbx   // f: no register, 3: %rbx, 0f: $15 immediate
+0x10a: 20 3 1                  | 	rrmovq %rbx, %rcx  // 3: %rbx, 1: %rcx
+0x10c:                         | loop:				   // loop at 0x10c
+0x10c: 40 1 3 fdffffffffffffff | 	rmmovq %rcx, -3(%rbx) // fd: 1111 1101, hence -3 immediate
+0x116: 60 3 1                  | 	addq %rbx, %rcx
+0x118: 70 0c01000000000000    | 	jmp loop	(at 0x10, 0c 01 in the view of little-endian 
