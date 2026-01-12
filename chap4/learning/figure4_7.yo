@@ -1,0 +1,40 @@
+                            | # Execution begins at address 0
+0x000:                      | 	.pos 0
+0x000: 30f40002000000000000 | 	irmovq stack, %rsp		# Set up stack pointer in %rsp
+0x00a: 803800000000000000   | 	call main				# Execute main program
+0x013: 00                   | 	halt					# Terminate program
+                            | 
+                            | # Array of 4 elements
+0x018:                      | 	.align 8				# Round the address up to a multiple of 8.
+0x018:                      | array:						# array label.
+0x018: 0d000d000d000000     | 	.quad 0x000d000d000d	# array[0] value.
+0x020: c000c000c0000000     | 	.quad 0x00c000c000c0	# array[1] value.
+0x028: 000b000b000b0000     | 	.quad 0x0b000b000b00	# array[2] value.
+0x030: 00a000a000a00000     | 	.quad 0xa000a000a000	# array[3] value.
+                            | 
+                            | 
+0x038:                      | main:
+0x038: 30f71800000000000000 | 	irmovq array, %rdi		# 1st parameter
+0x042: 30f60400000000000000 | 	irmovq $4, %rsi			# 2nd parameter
+0x04c: 805600000000000000   | 	call sum				# sum(array, 4)
+0x055: 90                   | 	ret
+                            | 
+                            | # long sum(long *start, long count), or long sum(long start[], long count).
+0x056:                      | sum:
+0x056: 30f80800000000000000 | 	irmovq $8, %r8			# Constant 8, address increment by 8.
+0x060: 30f90100000000000000 | 	irmovq $1, %r9			# Constant 1, 'count' parameter decrement by 1.
+0x06a: 6300                 | 	xorq %rax, %rax			# Initialization of return value with 0.
+0x06c: 6266                 | 	andq %rsi, %rsi			# Set up Zero Flag(either 0 or 1).
+0x06e: 708700000000000000   | 	jmp test				
+0x077:                      | loop:
+0x077: 50a70000000000000000 | 	mrmovq (%rdi), %r10		# Move arr[0] to %r10 register.
+0x081: 60a0                 | 	addq %r10, %rax			# Sum.
+0x083: 6087                 | 	addq %r8, %rdi			# Address increases by its word size(8 here.)
+0x085: 6196                 | 	subq %r9, %rsi			# count-- (toward 0), so count should be nonnegative for this program to be properly terminated, and set CC
+0x087:                      | test:
+0x087: 747700000000000000   | 	jne loop				# Loop when count is nonzero.
+0x090: 90                   | 	ret
+                            | 
+                            | # Stack starts here and grows to lower addresses. It secures the program from unintentional invasion of other memory region.
+0x200:                      | 	.pos 0x200
+0x200:                      | stack:

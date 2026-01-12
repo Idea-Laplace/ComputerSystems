@@ -1,0 +1,42 @@
+0x000:                      | 	.pos 0
+0x000: 30f40002000000000000 | irmovq stack, %rsp
+0x00a: 803800000000000000   | call main
+0x013: 00                   | halt
+                            | 
+0x018:                      | 	.align 8
+0x018:                      | array:
+0x018: 0100000000000000     | 	.quad 0x01
+0x020: ffffffffffffffff     | 	.quad 0xffffffffffffffff
+0x028: 0200000000000000     | 	.quad 0x02
+0x030: 0300000000000000     | 	.quad 0x03
+                            | 
+0x038:                      | main:
+0x038: 30f71800000000000000 | 	irmovq array, %rdi
+0x042: 30f60400000000000000 | 	irmovq $4, %rsi
+0x04c: 805600000000000000   | 	call absum	
+0x055: 90                   | 	ret
+                            | 
+                            | 
+0x056:                      | absum:
+0x056: 30f80800000000000000 | 	irmovq $8, %r8			# Constant 8, the quadword width
+0x060: 30f90100000000000000 | 	irmovq $1, %r9			# Constant 1, index increment
+0x06a: 6300                 | 	xorq %rax, %rax			# Set 0 in %rax
+0x06c: 709b00000000000000   | 	jmp test
+0x075:                      | loop:
+0x075: 50a70000000000000000 | 	mrmovq (%rdi), %r10		# Save the first argument
+0x07f: 62aa                 | 	andq %r10, %r10			# Condition code update
+0x081: 729500000000000000   | 	jl neg
+0x08a: 60a0                 | 	addq %r10, %rax			# Add element
+0x08c: 709700000000000000   | 	jmp update				# Jump over the following neg block.
+0x095:                      | neg:
+0x095: 61a0                 | 	subq %r10, %rax			# Substract the array element when (%rdi) is negative.
+0x097:                      | update:
+0x097: 6087                 | 	addq %r8, %rdi			# Next array element address
+0x099: 6196                 | 	subq %r9, %rsi			# Addition count update, should be positive integer.
+0x09b:                      | test:
+0x09b: 6266                 | 	andq %rsi, %rsi			# Not necessary line, just for the CC safety.
+0x09d: 747500000000000000   | 	jne loop				# Loop condition
+0x0a6: 90                   | 	ret
+                            | 
+0x200:                      | 	.pos 0x200
+0x200:                      | stack:

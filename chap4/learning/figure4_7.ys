@@ -1,0 +1,40 @@
+# Execution begins at address 0
+	.pos 0
+	irmovq stack, %rsp		# Set up stack pointer in %rsp
+	call main				# Execute main program
+	halt					# Terminate program
+
+# Array of 4 elements
+	.align 8				# Round the address up to a multiple of 8.
+array:						# array label.
+	.quad 0x000d000d000d	# array[0] value.
+	.quad 0x00c000c000c0	# array[1] value.
+	.quad 0x0b000b000b00	# array[2] value.
+	.quad 0xa000a000a000	# array[3] value.
+
+
+main:
+	irmovq array, %rdi		# 1st parameter
+	irmovq $4, %rsi			# 2nd parameter
+	call sum				# sum(array, 4)
+	ret
+
+# long sum(long *start, long count), or long sum(long start[], long count).
+sum:
+	irmovq $8, %r8			# Constant 8, address increment by 8.
+	irmovq $1, %r9			# Constant 1, 'count' parameter decrement by 1.
+	xorq %rax, %rax			# Initialization of return value with 0.
+	andq %rsi, %rsi			# Set up Zero Flag(either 0 or 1).
+	jmp test				
+loop:
+	mrmovq (%rdi), %r10		# Move arr[0] to %r10 register.
+	addq %r10, %rax			# Sum.
+	addq %r8, %rdi			# Address increases by its word size(8 here.)
+	subq %r9, %rsi			# count-- (toward 0), so count should be nonnegative for this program to be properly terminated, and set CC
+test:
+	jne loop				# Loop when count is nonzero.
+	ret
+
+# Stack starts here and grows to lower addresses. It secures the program from unintentional invasion of other memory region.
+	.pos 0x200
+stack:

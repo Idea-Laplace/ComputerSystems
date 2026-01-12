@@ -1,0 +1,19 @@
+The following assembly-code function lets us determine the behavior
+of the instruction popq %rsp for x86-64:
+
+	.text
+	.globl poptest
+poptest:
+	movq	%rsp, %rdi	# Save stack pointer
+	pushq	$0xabcd
+	popq	%rsp		# The instruction of interest
+	movq	%rsp, %rax
+	movq	%rdi, %rsp	# Restore stack pointer
+
+We find this function always returns 0xabcd. What does this imply about
+the behavior of popq %rsp? What other Y86-64 instruction would have the
+exact same behavior?
+
+Ans: The popped value 0xabcd, overwrites %rsp, discarding the address that has incremented by 8.
+
+V86-64: mrmovq (%rsp), %rsp

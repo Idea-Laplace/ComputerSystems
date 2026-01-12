@@ -1,0 +1,33 @@
+For each byte sequence listed, determine the Y86-64 instruction
+sequence it encodes. If there is some invalid byte in the sequence,
+show the instruction sequence up to that point and indicate where the
+invalid value occurs. For each sequence, we show the starting address,
+then a colon,  and then the byte sequence.
+
+A. 0x100: 30f3fcffffffffffffff40630008000000000000 
+B. 0x200: a06f800c020000000000000030f30a00000000000000
+C. 0x300: 5054070000000000000010f0b01f 
+D. 0x400: 611373000400000000000000
+E. 0x500: 6362a0f0
+
+--------------------------------------
+A. 0x100: 30 f3 fcffffff ffffffff | irmovq $-4, %rbx
+   0x10a: 40 63 00080000 00000000 | rmmovq %rsi, 0x800(%rbx)
+   0x114: 00					  | halt
+
+B. 0x200: a0 6f				  	  | pushq %rsi
+   0x202: 80 0c020000 00000000    | call 0x20c(It would be a process address)
+   0x20b: 00                      | halt
+   0x20c: 30 f3 0a000000 00000000 | irmovq $0x0a, %rbx
+
+C. 0x300: 50 54 07000000 00000000 | mrmovq 0x07(%rsp), %rbp
+   0x30a: 10					  | nop
+   0x30b: f0					  | // Invalid byte code.
+   0x30c: b0 1f 				  | popq %rcx 
+
+D. 0x400: 61 13 				  | subq %rcx, %rbx
+   0x402: 73 00040000 00000000    | je 0x0400 (It would be a label address)
+   00 							  | halt
+
+E. 0x500: 63 62					  | xorq %rsi, %rdx
+   0x502: a0 f0					  | pushq f0 // Invalid register code, should be 0f or either(Xf).

@@ -1,0 +1,17 @@
+Modify the Y86-64 code for the sum function to implement a function
+absSum that computes the sum of absolute values of an array.
+Use a conditional jump instruction with your loop.
+
+sum:
+	irmovq $8, %r8			# Constant 8, the quadword width
+	irmovq $1, %r9			# Constant 1, index increment
+	xorq %rax, %rax			# Set 0 in %rax
+	jmp test
+loop:
+	mrmovq (%rdi), %r10		# Save the first argument
+	addq %r10, %rax			# Add element
+	addq %r8, %rdi			# Next array element address
+	subq %r0, %rsi			# Addition count update, should be positive integer.
+test:
+	jne loop				# Loop condition
+	ret

@@ -1,0 +1,58 @@
+	.pos 0
+	irmovq stack, %rsp
+	call main
+	halt
+	
+main:
+	irmovq array, %rdi
+	irmovq $4, %rsi
+	call rproduct
+	ret
+
+# All array elements are assumed to be nonnegative.
+	.align 8
+array:
+	.quad 0x01
+	.quad 0x02
+	.quad 0x03
+	.quad 0x04
+
+rproduct:
+	irmovq $1, %rax
+	andq %rsi, %rsi
+	jle trivial
+
+	pushq %rbx
+	mrmovq (%rdi), %rbx # save the first value
+
+	irmovq $-1, %r8
+	addq %r8, %rsi		# count--
+	irmovq $8, %r9
+	addq %r9, %rdi		# start + 1
+
+
+	andq %rbx, %rbx     # %rbx 0?
+	je zero				# Fast return
+	call rproduct		# recursive call, %rax updated.
+
+	rrmovq %rax, %r10	# save %rax
+	xorq %rax, %rax 	# Clear current %rax
+
+loop:
+	addq %r10, %rax		# add (%rbx) times.
+	addq %r8, %rbx
+	jne loop
+
+done:
+	popq %rbx
+	ret
+
+zero:
+	irmovq $0, %rax
+	jmp done
+
+trivial:
+	ret
+
+	.pos 0x200
+stack:

@@ -1,0 +1,35 @@
+Let us determine the behavior of the instruction pushq %rsp for an x86-64
+processor. We could try reading the Intel documentation on this instruction,
+but a simpler approach is to conduct an experiment on an actual macine. The
+C compiler would not normally generate this instruction, so we must use hand-
+generated assembly code for this task. Here is a test function we have written
+(Web Aside ASM:EASM on page214(3e) describes how to write programs that combine
+C code with handwritten assembly code.):
+
+	.text
+	.globl pushtest
+pushtest:
+	movq	%rsp, %rax	# Save the original %rsp value
+	pushq	%rsp		# The step of interest in this problem.
+	popq	%rdx		# Save the %rsp value after push in %rdx
+	subq	%rdx, %rax	# 0 if %rdx contains the original %rsp value, 8 either.
+	ret
+
+In our experiment, we find that function pushtest always returns 0. What
+does this imply about the behavior of the instruction pushq %rsp under x86-64?
+
+Ans: The pushq instruction saves the original stack address 'Addr' in the 'Addr-8' address.
+
+
+===========================================================
+
+	     Memory Stack
+
+%rsp ---> -----------  0x108
+		  -----------  0x100
+
+==  pushq   %rsp    ==============
+
+          -----------  0x108
+%rsp ---> ---0x108---  0x100
+

@@ -1,0 +1,38 @@
+	.pos 0
+irmovq stack, %rsp
+call main
+halt
+
+	.align 8
+array:
+	.quad 0x01
+	.quad 0xffffffffffffffff
+	.quad 0x02
+	.quad 0x03
+
+main:
+	irmovq array, %rdi
+	irmovq $4, %rsi
+	call absum	
+	ret
+
+absum:
+	irmovq $8, %r8			# Constant 8, the quadword width
+	irmovq $1, %r9			# Constant 1, index increment
+	xorq %rax, %rax			# Set 0 in %rax
+	jmp test
+loop:
+	mrmovq (%rdi), %r10		# Save the first argument(say x).
+	xorq %r11, %r11			# Set %r11 to 0.
+	subq %r10, %r11			# Save -x in %r11
+	cmovge %r11, %r10		# Exchange value when -x is positive.
+	addq %r10, %rax			# Add element
+	addq %r8, %rdi			# Next array element address
+	subq %r9, %rsi			# Addition count update, should be positive integer.
+test:
+	andq %rsi, %rsi			# For the CC safety.
+	jne loop				# Loop condition
+	ret
+
+	.pos 0x200
+stack:
