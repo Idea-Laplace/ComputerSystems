@@ -1,0 +1,38 @@
+Fill in the right-hand column of the following table to describe
+the processing of the call instruction on line 9 of the object code
+in Figure 4.17
+	
+
+...
+0x037: 804100000000000000:		call proc
+...
+0x041:	proc:
+0x041:	ret
+
+Figure 4.17
+
+Stage		Generic					Specific call 0x041
+================================================================
+Fetch		icode:ifun <- M1[PC]	icode:ifun <- M1[0x037](8:0)
+			valC <- M8[PC+1]		valC <- M8[0x38] = 0x41(little endian)
+			valP <- PC + 9			valP <- 0x037 + 9 = 0x040
+
+	
+Decode		valB <- R[%rsp]			valB <- 128
+
+Execute		valE <- valB + (-8)		valE <- 120
+
+Memory		M8[valE] <- valP		M8[120] <- 0x040 # return address
+
+Write back	R[%rsp] <- valE			R[%rsp] <- 120 	# stack pointer update.
+
+PC update	PC <- valC				PC <- 0x041 # address of proc.
+
+
+What effect would this instruction execution have on the registers, the PC,
+and the memory?
+
+Register: %rsp -= 8, memory stack pointer decreases due to saving for return address
+PC		: Designated to the address of the process called instead of the very next instruction,
+		  valP(PC+9) would be loaded at the end of 'proc'.
+Memory	: The valP, return address, is saved in the virtual stack memory.

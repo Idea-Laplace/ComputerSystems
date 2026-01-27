@@ -1,0 +1,28 @@
+What would be the effect of the instruction pushq %rsp according
+to the steps listed in Figure 4.20? Does this conform to the desired
+behavior for Y86-64, as determined in Problem 4.7?
+
+Figure 4.20
+
+Stage		pushq rA
+--------------------------------
+Fetch		icode:ifun <- M1[PC]
+			rA:rB <- M1[PC + 1]
+			valP <- PC + 2
+
+Decode		valA <- R[rA]
+			valB <- R[%rsp]
+
+Execute		valE <- valB <- (-8)
+
+Memory		M8[valE] <- R[rA]
+
+Write back	R[%rsp] <- valE
+
+PC update	PC <- valP
+
+
+
+As shown in the Decode and Memory block, the saved data will be the original %rsp value,
+and then %rsp will be updated by 8 like other normal cases. This process conforms to the
+desired behavior for Y86-64.

@@ -1,0 +1,67 @@
+Register ID dstM indicates the destination register for write port M,
+where valM, the value read from memory, is stored. This is shown in Figures
+4.18 to 4.21 as the seoncd step in the write back stage. Write HCL cdoe for dstM.
+
+
+Ref)
+# WarningL Conditional move not implemented correctly here.
+
+word dstE = [
+		icode in { IRRMOVQ } : rB;
+		icode in { IIRMOVQ, IOPQ } : rB;
+		icode in { IPUSHQ, IPOPQ, ICALL, IRET } : RRSP;
+		1 : RNONE; 	# Don't write any register.
+];
+
+Stage		OPq rA, rB				rrmovq rA, rB			irmovq V rB
+-------------------------------------------------------------------------
+~
+Execute		valE <- valB OP valA	valE <- 0 + valA		valE <- valC
+Memory
+Write back	R[rB] <- valE			R[rB] <- valE			R[rb] <- valE
+~
+-------------------------------------------------------------------------
+Figure 4.18
+
+
+
+Stage		rmmovq rA, rB			mrmovq rA, rB			
+-------------------------------------------------------
+~
+Execute		valE <- valB + valC		valE <- valB + valC
+Memory		M8[valE] <- valA		valM <- M8[valE]
+Write back							R[rA] <- valM
+~
+-------------------------------------------------------
+Figure 4.19
+
+
+Stage		pushq rA			popq rA
+----------------------------------------------------
+~
+Execute		valE <- valB + (-8) valE <- valB + 8
+Memory		M8[valE] <- valA	valM <- M8[valA]
+Write back	R[%rsp] <- valE		R[%rsp] <- valE
+								R[rA] <- valM
+~
+----------------------------------------------------
+Figure 4.20
+
+Stage		jXX Dest				call Dest			ret
+-------------------------------------------------------------------------
+~
+Execute		Cnd <- Cond(CC, ifun)	valE <- valB + (-8)	valE <- valB + 8
+Memory								M8[valE] <- valP	valM <- M8[valA]
+Write back							R[%rsp] <- valE		R[%rsp] <- valE
+~
+-------------------------------------------------------------------------
+Figure 4.21
+
+=====================================================================================
+
+Hence,
+
+word dstM = [
+		icode in { IMRMOVQ, IPOPQ } : rA;
+		1 : RNONE; 	# Don't write any register.
+];

@@ -1,0 +1,10 @@
+Write HCL code for Stat, generating the 4 status codes SAOK, SADR,
+SINS and SHLT(see Figure 4.26).
+
+
+ word Stat = [
+	 imem_error || dmem_error : SADR;		# Instruction memory or data memory errer.
+	 !instr_valid : SINS;					# Invalid instruction code.
+	 icode == IHALT : SHLT					# Halt by the halt icode signal.
+	 1 : SAOK;								# Normal case.
+ ];

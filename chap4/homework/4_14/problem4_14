@@ -1,0 +1,26 @@
+Fill in the right-hand column of the following table to describe the processing
+of the popq instruction on line 7 of the object code in Figure 4.17
+
+0x016: 30f480..00	| irmovq $128, %rsp
+...
+0x02a: a02f			| pushq %rdx    		# %rdx=9, %rsp = 120
+0x20c: b00f			| popq %rax
+
+
+Stage		Generic	popq rA			Specific popq %rax
+======================================================
+Fetch		icode:ifun <- M1[PC]	icode:ifun <- b:0(popq)
+			rA:rB <- M1[PC + 1]		rA:rB <- 0:f(%rax:none)
+			valP <- PC + 2			valP <- 0x20c + 2 = 0x20e
+
+Decode		valA <- R[%rsp]			valA = (%rsp) = 120
+			valB <- R[%rsp]			valB = 120
+
+Execute		valE <- valB + 8		valE = 120 + 8 = 128
+
+Memory		valM <- M8[valA]		valM = M8[valA] = 9
+
+Write back	R[%rsp] <- valE			R[%rsp] <- 128
+			R[rA] <- valM			R[%rax] <- 9
+
+PC update	PC <- valP				PC <- 0x20e

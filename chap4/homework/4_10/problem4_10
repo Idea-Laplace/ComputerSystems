@@ -1,0 +1,24 @@
+Suppose you want to implement a word-level equality circuit using the
+exclusive-or circuit from Problem 4.9 rather than from bit-level equality
+circuit. Design such a circuit fore a 64-bit word consisting of 64 bit-level
+exclusive-or circuits and two additional logic gates.
+
+Let 2 64-bit word be denoted by a = (a1, a2, ..., a64) and b = (b1, b2, ..., b64).
+
+XOR circuit expression: (!a && b) || (a && !b)
+
+For an n-index bit: (!an && bn) || (an && !bn)
+
+Define an XOR bn := (!an && bn) || (an && !bn), implying an != bn
+
+(an XOR bn) = !(an EQ bn).
+
+
+========================================
+
+a EQ b := [&&(n=1, 64)](an EQ bn)
+
+		= !([||(n=1, 64)](an XOR bn))
+
+Use OR gate instead of AND when in the case of Bit-equal circuit,
+and then convert the signal by using NOT gate.

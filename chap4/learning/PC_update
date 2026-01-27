@@ -1,0 +1,10 @@
+word new_pc = [
+		# Call. Use instruction constant.
+		icode == ICALL : valC;
+		# Taken branch. Use instructino constant.
+		icode == IJXX && Cnd : valC;
+		# Completion of RET instruction. Use vale from stack.
+		icode == RET : valM;
+		# Default: Use incremented PC.
+		1 : valP;
+]

@@ -1,0 +1,13 @@
+Write HCL code for the signal need_valC in the SEQ implementation.
+
+Hint:
+
+bool need_rigids = 
+	icode in { IRRMOVQ, IOPQ, IPUSHQ, IPOPQ,
+				IIRMOVQ, IRMMOVQ, IMRMOVQ};
+
+
+=======================================================
+
+bool need_valC = 
+	icode in { IIRMOVQ, IRMMOVQ, IMRMOVQ, IJXX, ICALL };

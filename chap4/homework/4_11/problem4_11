@@ -1,0 +1,22 @@
+word Min3 = [
+	A <= B && A <= C : A;
+	B <= C && B <= C : B;
+	1			 	 : C;
+];
+
+The HCL code given for computing the minimum of 3 words
+contains 4 comparison expressions of the form x <= y.
+Rewrite the code to compute the same result, but using
+only 3 comparisons.
+
+
+Ans)
+
+word Min3 = [
+	A <= B && A <= C : A;
+	B <= C			 : B;
+	1			 	 : C;
+];
+
+If !(A <= B && A <= C), only X <= A <= Y or X <= Y <= A form is possible.
+Hence comparison between B and C is sufficient to determine the minimum.

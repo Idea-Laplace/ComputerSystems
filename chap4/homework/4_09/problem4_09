@@ -1,0 +1,8 @@
+Write an HCL expression for a signal XOR, equal to the exclusive-or
+of inputs a and b. what is the relatio between the signals xor and eq
+defines above?
+
+Ans) xor = (a && !b) || (!a && b)
+
+The signal eq means that a and b have same inputs(00 or 11),
+while the signal xor impiles that a and b have different inputs(10 or 01)

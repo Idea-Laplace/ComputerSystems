@@ -1,0 +1,46 @@
+We can see by the instruction encoding (Figure 4.2 and 4.3) that the
+rrmovq instruction is the unconditional version of a more general class
+of instructions that include the conditional moves. Show how you would
+modify the steps for the rrmovq instruction below to also handle the six
+conditional move instructions. You may find it useful to see how the
+implementation of the jXX instructions handles conditional behavior.
+
+
+Stage		rrmovq rA, rB
+------------------------------------------------
+Fetch		icode:ifun <- M1[PC]
+			rA:rB <- M1[PC + 1]
+			valP <- PC + 2
+
+Decode 		valA <- R[rA]
+
+Execute		valE <- 0 + valA
+
+Memory
+
+Write back	R[rB] <- valE
+
+PC update	PC <- valP
+
+
+
+
+
+ 
+Stage		cmovXX rA, rB
+------------------------------------------------
+Fetch		icode:ifun <- M1[PC]
+			rA:rB <- M1[PC + 1]
+			valP <- PC + 2
+
+Decode 		valA <- R[rA]
+			valB <- R[rB]
+
+Execute		Cnd <- Cond(CC, ifun)		# ifun : le, l, e, ne, g, ge
+			valE <- 0 + valA
+
+Memory
+
+Write back	if (Cnd) R[rB] <- valE		# 'if (Cnd)' added.
+
+PC update	PC <- valP

@@ -1,0 +1,29 @@
+Assume the 2 register writes in the write-back stage for popq
+occur in the order listed in Figure 4.20. What would be the effect of
+executing popq %rsp? Does this conform to the desired behavior for Y86-64,
+as determined in Problem 4.8?
+
+
+Figure 4.20
+
+Stage			popq rA
+----------------------------------
+Fetch			icode:ifun <- M1[PC]
+				rA:rB <- M1[PC + 1]
+				valP <- PC + 2
+
+Decode			valA <- R[%rsp]
+				valB <- R[%rsp]
+
+Execute			valE <- valB + 8   # Address after pop.
+
+Memory			valM <- M8[valA]   # Normal popped value.
+
+Write back		R[%rsp] <- valE	   # Normal %rsp increment
+				R[%rA] <- valM	   # Overwrite happens when rA = %rsp.
+
+PC update		PC <- valP
+
+
+The writing valM on %rsp occurs later, hence %rsp will be overwritten
+by its corresponding address value. %rsp <- (%rsp)

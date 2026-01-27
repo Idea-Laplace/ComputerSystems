@@ -1,0 +1,20 @@
+The register signal srcB indicates which register should be read
+to generate the signal valB. The desired value is shown as the second
+step in the decode stage in Figures 4.18 to 4.21. Write HCL code for srcB.
+
+
+Reference:
+
+word srcA = [
+		icode in { IRRMOVQ, IRMMOVQ, IOPQ, IPUSHQ } : rA;
+		icode in { IPOPQ, IRET } : RRSP;
+		1 : RNONE;
+];
+
+==========================================================
+
+word srcB = [
+		icode in { IOPQ, IRMMOVQ, IMRMOVQ } : rB;
+		icode in { IPUSHQ, IPOPQ, ICALL, IRET } : RRSP;
+		1 : RNONE;
+];

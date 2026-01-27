@@ -1,0 +1,47 @@
+Stage			jXX Dest		
+------------------------------------
+Fetch			icode:ifun <- M1[PC]
+				valC <- M8[PC + 1]	# goto valC if condition is true.
+				valP <- PC + 9		# If condition fails, the PC will be valP.
+
+Decode
+Excute			Cnd <- Cond(CC, ifun)
+Memory
+Writeback
+PC update		PC <- Cnd ? valC : valP
+
+
+
+Stage			call Dest
+------------------------------------
+Fetch			icode:ifun <- M1[PC]
+				valC <- M8[PC + 1]   # The address of the process called.
+				valP <- PC + 9		 # When the 'call' instruction ends, PC should return to valP
+
+Decode			valB <- R[%rsp]		 # stack pointer
+
+Execute			valE <- valB + (-8)  
+
+Memory			M8[valE] <- valP	# Save return address.
+
+Write back		R[%rsp] <- valE 	# Stack pointer decrement(after saved.).
+
+PC update		PC <- valC
+
+
+
+Stage			ret
+------------------------------------
+Fetch			icode:ifun <- M1[PC]
+				valP <- PC + 1
+
+Decode			valA <- R[%rsp]
+				valB <- R[%rsp]
+
+Execute			valE <- valB + 8	# Stack pointer after return.
+
+Memory			valM <- M8[valA]	# return address.
+
+Write back		R[%rsp] <- valE		# Stack pointer restores.
+
+PC update		PC <- valP

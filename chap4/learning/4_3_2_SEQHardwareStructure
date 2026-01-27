@@ -1,0 +1,47 @@
+SEQ: SEQuential Structure.
+
+Processing is performed by 'hardware units'
+associated with different stages.
+
+In SEQ, all of the processing by the hardware units occurs within
+a single clock cycle.
+
+
+
+6 stages
+
+Fetch : Using the program counter(PC) register as an address,
+	  	the instruction memory reads the bytes of an instruction.
+		The PC incrementer computes valP, the incremented PC.
+
+Decode:	The register file has 2 read ports, A and B, via which
+		register values valA and valB are read simultaneously.
+
+Execute:		The execute stage uses the arithmetic/logic unit(ALU)
+			for different purposes according to the instruction type.
+			For integer operations, it performs the specified operation.
+			For other instructions, it serves as an adder to compute an
+			incremented or decremented stack pointer, to compute an effective
+			address, or simply to pass one of its inputs to its outputs by
+			adding 0.
+				The condition code register(CC) holds the 3 condition code bits.
+			New values for the condition codes are computed by the ALU. When
+			executing a conditional move instruction, the decision as to whether
+			or not to update the destination register is computed based on the
+			condition codes and mov condition. Similarly, when executing a jump
+			instruction. the branch signal Cnd is computed based on the condition
+			codes and the jump type.
+
+Memory	:	The data memory reads or writes a word of memory when executing a memory
+			instruction. The instuction and data memories access the same memory
+			locations, but for different purpose.
+	
+Write back	: 	The register file has 2 write ports. Port E is used to write values
+				computed by the ALU, while port M is used to write values read from
+				the data memory.
+
+PC update	:	The new value of the program counter is selected to be either
+				valP, the address of the next instruction, valC, the destination
+				address specified by a call or jump instruction, or valM, the return
+				address read from memory.
+				

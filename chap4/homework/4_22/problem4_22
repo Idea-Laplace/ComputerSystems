@@ -1,0 +1,26 @@
+Only the popq instruction uses both register file write ports
+simultaneously. For the instruction popq %rsp, the same address
+will be used for both the E and M write ports, but with different
+data. To handle this conflict, we must establish a priority among
+the 2 write ports so that when both attempt to write the same
+register on the same cycle, only the write from the higher-priority
+port takes place. Which of the two ports should by given priority in
+order to implement the desired behavior, as determined in Practice 4.8?
+
+
+Practice 4.8: Popped value takes priority over address update.
+
+With reference to the following flow of popq:
+
+Execute		valE <- valB + 8
+Memory		valM <- M8[valA]
+
+Both valA and valB indicate R[%rsp].
+----------------------------------------------------
+
+
+so valM takes priority over valE.
+
+
+
+
