@@ -1,0 +1,29 @@
+Suppose we could take the system of Figure 4.32 and divide it into an arbitary
+number of popeline stages k, each having a delay of 300/k, and with each pipeline
+register having a delay of 20 ps.
+
+A. What would be the latency and the throughput of the system, as functions of k?
+
+Ans)
+Throughput:
+
+clock: 300/k ps + 20 ps
+Throughput = 1 / clock
+           = 1 / (300/k + 20) ps
+           = [k / (300 + 20k)] ps-1
+
+
+Latency:
+
+k * ( 300 / k + 20) ps = (300 + 20k) ps
+
+
+B. What would be the ultimate limit on the throughput?
+
+k -> infinity, throughput -> 1/20ps = 500 GIPS
+(Just a theoretical value, you cannot make stage comsuming time 0 for real.)
+(Also, latency goes to infinity as k goes to infinity, since Latency = 300 + 20k.)
+
+In other words, you can't make a clock cycle shorter than 20 ps.
+
+When you split one more, then latency would be added by 20 ps.

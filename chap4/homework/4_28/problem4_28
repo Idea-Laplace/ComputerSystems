@@ -1,0 +1,70 @@
+Suppose we analyze the combinational logic of Figure 4.32 and determine that it
+can be separated into a sequence of six blocks, named A to F, having delays of 80,
+30, 60, 50, 70 and 10 ps, respectively, illustrated as follows:
+
+--------    ---     ------      -----       -------     -   --
+A           B       C           D           E           F   PR
+--------    ---     ------      -----       -------     -   --
+
+We can create pipelined versions of this design by inserting pipeline registers
+between pairs of these blocks. Different combinations of pipeline depth (how many
+stages) and maximum throughput arise, depending on where we insert the pipeline
+register. Assume that a pipeline register has a delay of 20 ps.
+
+Throughput := The number of completion event of instructions / 1 cycle
+Latency := Total time requirement per instruction.
+
+No pipelined: Throughput: 1000 * 1 / 320 ps = 3.13 GIPS, Latency: 320 ps.
+
+A. Inserting a single register gives a 2-stage pipeline. Where should the register
+   be inserted to maximize throughput? what would be the throughput and latency?
+
+Ans) 8:3:6:5:7:1 8+3+6 = 17, 5+7+1 = 13, this is the case that reduces the difference
+    between 2 stages most.
+    The register should be in between C and D.
+    
+    Stage 1: 170 ps + 20 ps = 190 ps.
+    Stage 2: 130 ps + 20 ps = 150 ps, plus idle time 40 ps.
+
+    Throughput = 1000 / 190 ps = 5.26 GIPS
+    Latency = 190 ps * 2 (stages) =  380 ps.
+
+B. Where should two registers be inserted to maximize the throughput of a 3-stage pipeline?
+   What would be the throughput and latency?
+
+Ans)  Combination (A, B), (C, D) and (E, F) minimizes idle time, the maximum stage time is 11,
+
+    Stage 1: 110 ps + 20 ps = 130 ps
+    Stage 2: 110 ps + 20 ps = 130 ps
+    Stage 3: 80 ps + 20 ps + 30 ps(idle time) = 130 ps
+
+    Throughput = 1000 / 130 ps = 7.69 GIPS
+    Latency = 130 ps * 3 = 390 ps
+
+C. Where should be 3 registers be inserted to maximize the throughput of a 4-stage pipeline?
+   What would be the throughput and latency?
+
+And) A, (B, C), D, (E, F) > 80 : 90 : 50 : 80
+
+    Stage 1: (80 + 20) ps + 10 ps = 110 ps
+    Stage 2: (30 + 60 + 20) ps = 110 ps
+    Stage 3: (50 + 20) ps + 40 ps = 110 ps
+    Stage 4: (70 + 10 + 20) ps + 10 ps = 110 ps
+
+    Throughput = 1000 / 110 ps = 9.09 GIPS
+    Latency = 110 ps * 4 = 440 ps
+
+D. What is the minimum number of stages that would yield a design with the maximum achievable throughput?
+   Describe this design, it throughput, and its latency.
+
+5 stages: (E + F), (80 + 20) ps * 5 = 500 ps latency, throughput = 1000 / 100 ps = 10.00 GIPS
+6 stages: Descreate all, (80 + 20) ps * 6 = 600 latency, throughput = 1000 / 100 ps = 10.00 GIPS
+
+
+                No pipelined    2 stages    3 stages    4 stages    5 stages    6 stages
+Throughput      3.13 GIPS       5.26 GIPS   7.69 GIPS   9.09 GIPS   10.00 GIPS  10.00 GIPS
+Latency         320 ps          380 ps      390 ps      440 ps      500 ps      600 ps
+
+Spliting more than 5 stages would not increase throughput performance, causing latency penalty.
+In ideal case(no hazard, many instructions), latency penalty would be negligible, since
+they have same throughput(10.00 GIPS), but in reality, inefficient issues could arise.
