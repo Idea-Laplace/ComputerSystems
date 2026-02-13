@@ -1,0 +1,55 @@
+Our second case in the HCL code for d_valA uses signal e_dstE to see whether
+to select the ALU output e_valE as the forwarding  source. Suppose instead that
+we use signal E_dstE, the destination register ID in the pipeline register E for this
+selection. Write a Y86-64 program that would give an incorrect result with this
+modified forwarding logic.
+
+Original implementation
+
+word d_valA = [
+    D_icode in { ICALL, IJXX } : d_valP;
+    d_srcA == e_dstE : e_valE;
+    d_srcA == M_dstM : m_valM;
+    d_srcA == M_dstE : M_valE;
+    d_srcA == W_dstM : W_valM;
+    d_srcA == W_dstE : W_valE;
+    1 : d_rvalA;
+];
+
+
+Potentially hazardous implementation.
+
+word d_valA = [
+    D_icode in { ICALL, IJXX } : d_valP;
+    d_srcA == E_dstE : e_valE;  #
+    d_srcA == M_dstM : m_valM;
+    d_srcA == M_dstE : M_valE;
+    d_srcA == W_dstM : W_valM;
+    d_srcA == W_dstE : W_valE;
+    1 : d_rvalA;
+];
+
+sol)
+
+Since dstE update can occur in execution stage, we could imagine that using
+E_dstE instead of e_dstE would raise unexpected behavior when dstE update happens
+in execution stage.
+
+One of the cases that those exception could arise would be cmovXX.
+
+xorq    %rax, %rax
+irmovq  $1, %rdi
+irmovq  $2, %rsi
+cmove   %rdi, %rsi      # E_dstE = RRSI, e_dstE = RNONE.
+addq    %rsi, %rax 
+
+The decode stage for addq %rsi, %rax,
+the d_srcA would be equal to E_dst, so d_valA would be e_valE, 1.
+However, since 1 != 2, the write back will not taken.
+So e_dstE will be RNONE, and R[%rsi] will remain 2.
+
+Hence d_srcA == M_dstE would haven been taken if the condition were d_srcA == e_dstE, the original one.
+M_valE is 2, which is the correct value.
+
+Since d_srcA == E_dstE, E_dstE takes priority over d_srcA == M_dstE, so d_valA would be 1, not 2.
+so in the execution stage will output 1+1 instead of 2+1, which is not intended.

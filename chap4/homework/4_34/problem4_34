@@ -1,0 +1,16 @@
+Write HCL code for the signal d_valB, giving the value
+for source operand valB supplied to pipeline register E.
+
+====================================================
+
+Much simpler than d_valA, since d_srcB is not concerned with icode.
+So we only need concern to forwarding priority.
+
+word d_valB = [
+    d_srcB == e_dstE : e_valE;
+    d_srcB == M_dstM : m_valM;
+    d_srcB == M_dstE : M_valE;
+    d_srcB == W_dstM : W_valM;
+    d_srcB == W_dstE : W_valE;
+    1 : d_rvalB;                # Default case, when d_srcB is indenpendent of preceding instructions.
+];

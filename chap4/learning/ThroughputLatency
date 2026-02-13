@@ -1,0 +1,4 @@
+Throughput := instruction completion per unit time.
+           := 1 / cycle
+
+Latency := Required time for an instruction to be processed.

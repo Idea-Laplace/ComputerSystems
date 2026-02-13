@@ -1,0 +1,70 @@
+Suppose the order of the third and fourth cases (the 2 forwarding sources
+from the memory stage) in the HCL code for d_valA were reversed. Describe the
+resulting behavior of the rrmovq instruction (line 5) for the following program.
+
+irmovq  $5, %rdx
+irmovq  $0x100, %rsp
+rmmovq  %rdx, 0(%rsp)
+popq    %rsp
+rrmovq  %rsp, %rax
+
+================================================================================
+
+Ff - Dd - Ee - Mm - Ww
+     Ff - Dd - Ee - Mm
+          Ff - Dd - Ee
+               Ff - (Dd)  <- d_valA selection step
+
+word d_valA = [
+    D_icode in { ICALL, IJXX } : D_valP; # Use incremented PC. d_valA will indicate next instruction address.
+    d_srcA == e_dstE : e_valE            # Forward valE from execute. When evaluated value is supposed to be used in next srcA, say d_srcA.
+                                         # e_dstE is determined in ececution stage.
+    d_srcA == M_dstM : m_valM;           # Forward valM from memory, destination for valM should be determined before entering memory stage.
+    d_srcA == M_dstE : M_valE;           # dstE from 2-step previous instruction, already determined so M_dstE would be used.
+    d_srcA == W_dstM : W_valM;           # In write-back stage, both dstM and dstE would be determined, so pipelined register value is sufficient.
+    d_srcA == W_dstE : W_dstE;
+    1 : d_rvalA;                         #
+];
+
+Textbook version for d_valA.
+
+================================================================================
+
+word d_valA = [
+    D_icode in { ICALL, IJXX } : D_valP; 
+    d_srcA == e_dstE : e_valE            
+    d_srcA == M_dstE : M_valE   #
+    d_srcA == M_dstM : m_valM   #        
+    d_srcA == W_dstM : W_valM         
+    d_srcA == W_dstE : W_dstE
+];
+
+Reversed HCL code
+================================================================================
+
+Sol)
+
+No bubble case
+
+irmovq  $5, %rdx               
+irmovq  $0x100, %rsp          
+rmmovq  %rdx, 0(%rsp)        
+popq    %rsp                   Ee  # e_dst is %rsp
+rrmovq  %rsp, %rax             Dd  # d_srcA is %rsp
+
+Since popq %rsp should overwrite popped value the incremented stack pointer value,
+d_srcA == e_dst must be ignored, however, by the forwarding priority,
+as long as popq is in execution stage, that cannot be achieved.
+A typical load/use data hazard.
+
+So the popq stage must be in memory stage.
+
+irmovq  $5, %rdx               
+irmovq  $0x100, %rsp          
+rmmovq  %rdx, 0(%rsp)        
+popq    %rsp                   Mm  # M_dstE is %rsp, E_dstE is also %rsp.
+(bubble)
+rrmovq  %rsp, %rax             Dd  # d_srcA is %rsp
+
+Within this problem condtion, M_dstE takes procedence over M_dstM,
+so %rsp <- 0x100 + 8 will be happen, which is not intended.

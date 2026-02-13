@@ -1,0 +1,44 @@
+Suppose the order of the fifth and sixth cases(the 2 forwarding sources from
+the write-back stage) in the HCL code for d_valA were reversed. Write a Y86-64
+program that would be executed incorrectly. Describe how the error would occur
+and its effect on the progam behavior.
+
+Original HCL code:
+
+word d_valA = [
+    D_icode in { ICALL, IJXX } : D_valP;
+    d_srcA == e_dstE : e_valE;
+    d_srcA == M_dstM : m_valM;
+    d_srcA == M_dstE : M_valE;
+    d_srcA == W_dstM : W_valM;
+    d_srcA == W_dstE : W_valE;
+];
+
+==============================================
+5,6 Reversed HCL code:
+
+word d_valA = [
+    D_icode in { ICALL, IJXX } : D_valP;
+    d_srcA == e_dstE : e_valE;
+    d_srcA == M_dstM : m_valM;
+    d_srcA == M_dstE : M_valE;
+    d_srcA == W_dstE : W_valE; #
+    d_srcA == W_dstM : W_valM; #
+];
+
+==============================================
+
+irmovq $5, %rdx
+irmovq $0x100, %rsp     # R[%rsp] <- 0x100
+pushq %rdx              # R[%rsp] <- 0x108, M[0x100] <- 5
+popq %rsp               # R[%rsp] <- 5, R[%rsp] <- W_valE followed by R[%rsp] <- W_valM.
+irmovq $3, %rax         # Or simply nop
+irmovq $1, %rax         # Or simply nop
+rrmovq  %rsp, %rax
+
+
+Decode stage of rrmovq %rsp, %rax: d_srcA = %rsp
+Write-back stage of popq %rsp    : W_dstE = %rsp, W_dstM = %rsp
+
+Since d_srcA == W_dstE takes precedence over d_srcA == W_dstM,
+d_valA would be W_valE, 0x100, which is not intended.
