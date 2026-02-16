@@ -1,0 +1,18 @@
+Suppose we use a branch prediction strategy that achieves a success rate of 0.65,
+such as backward taken, forward not taken(BTFNT), as described in Section 4.5.4.
+What would be the impact on CPI, assuming all of the other frequencies are not effected?
+
+CPI = 1.0 + lp + mp + rp;
+
+Y86-64 design takes 'always taken' prediction strategy, sucess rate of which is 0.60.
+
+Cause       Name        Instruction         Condition      Bubbles     Product
+                        frequency           frequency
+-----------------------------------------------------------------------------------
+Load/use    lp          0.25                  0.20           1          0.05
+Mispredict  mp          0.20               0.40->0.35        2          0.16->0.14
+Return      rp          0.02                  1.00           3          0.06
+-----------------------------------------------------------------------------------
+Total penalty                                                           0.27->0.25
+CPI                                                                     1.27->1.25
+CPI_BTFNT/CPI_AT    =   1.25 / 1.27 = 0.984

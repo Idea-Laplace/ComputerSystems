@@ -1,0 +1,15 @@
+# Test instruction that modifies %rsp followed by ret
+
+    irmovq mem, %rbx        # %rbx <- 0x40
+    mrmovq 0(%rbx), %rsp    # %rsp <- M[0x40] = rtnpt
+    ret                     # In decode stage, ret d_srcA is RRSP, which is also E_dstM.
+    halt
+rtnpt:
+    irmovq $5, %rsi
+    halt
+.pos 0x40
+mem:
+    .quad stack
+.pos 0x50
+stack:
+    .quad rtnpt

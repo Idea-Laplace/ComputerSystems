@@ -1,0 +1,16 @@
+Write HCL code for the signal D_stall in the PIPE implementation.
+
+bool F_stall = 
+    # Condtion for a load/use hazard
+    E_icode in { IMRMOVQ, IPUSHQ } &&
+    E_dstM in { d_srcA, d_srcB } ||     # && takes priority over ||.
+
+    # Stalling at fetch while ret passes through pipeline.
+    IRET in { D_icode, E_icode, M_icode };
+
+
+==========================================================================
+
+bool D_stall =
+    E_icode in { IMRMOVQ, IPUSHQ } &&
+    E_dstM in { d_srcA, d_srcB };

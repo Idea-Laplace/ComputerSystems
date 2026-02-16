@@ -1,0 +1,102 @@
+In section 3.4.2, the x86-64 pushq instruction was described as decrementing the
+stack pointer and then storing the register at the stack pointer location. So, if
+we had an instruction of the form pushq REG, for some register REG, it would be 
+equivalent to the code sequence:
+
+subq $8, %rsp
+movq REG, (%rsp)
+
+A. In light of analysis done in Practice Porblem 4.7, does this code sequence
+   correctly describe the behavior of the instruction pushq %rsp? Explain.
+
+Ans) No, when pushq %rsp is executed, the above implementation will do:
+
+# Assume that %rsp had value X.
+subq $8, %rsp       # Stack pointer, %rsp will contain X-8.
+movq %rsp, (%rsp)   # Value 'X-8' will be stored at X-8.
+
+However, what actually happens is that X will be stored at X-8, the orignal stack pointer
+address value at X-8.
+
+---------
+  0x???   X      <--- %rsp
+---------
+  0x???   X-8
+---------
+
+subq $8, %rsp
+movq %rsp, (%rsp)
+
+---------
+  0x???   X      
+---------
+  X-8     X-8    <--- %rsp (Not equivalent to pushq %rsp!)
+---------
+
+======================================================================
+pushq %rsp
+
+---------
+  0x???   X      
+---------
+    X     X-8    <--- %rsp 
+---------
+
+
+
+
+
+B. How could you rewrite the code sequence so that it correctly describes both
+   the cases where REG is %rsp as well as any other register?
+
+Ans)
+
+movq REG -8(%rsp)
+subq $8, %rsp
+
+1) Default
+---------
+  0x???   X      <--- %rsp
+---------
+  0x???   X-8
+---------
+
+2) movq REG -8(%rsp)
+---------
+  0x???   X      <--- %rsp
+---------
+  R[REG]  X-8
+---------
+
+3) subq $8, %rsp
+---------
+  0x???   X      
+---------
+  R[REG]  X-8    <--- %rsp
+---------
+======================================================================
+
+movq %rsp, -8(%rsp)
+subq $8, %rsp
+
+1) Default
+---------
+  0x???   X      <--- %rsp
+---------
+  0x???   X-8
+---------
+
+2) movq %rsp -8(%rsp)
+---------
+  0x???   X      <--- %rsp
+---------
+    X     X-8
+---------
+
+3) subq $8, %rsp
+---------
+  0x???   X      
+---------
+    X     X-8    <--- %rsp
+---------
+

@@ -1,0 +1,82 @@
+In Section 3.4.2, the x86-64 poopq instruction was described as copying the result from
+the top of the stack to the destination register and then incrementing the stack pointer.
+So, if we had an instruction of the form popq REG, it would be equivalent to the code sequence:
+
+movq (%rsp), REG
+addq $8, %rsp
+
+A.  In light of analysis done in Practice Problem 4.8, does this code sequence correctly
+    describe the behavior of the instruction popq %rsp? Explain.
+
+No.
+
+---------
+   ???     X + 8
+---------
+   Val     X     <--- %rsp
+---------
+
+popq %rsp
+
+---------
+   ???     X + 8
+---------
+   Val     X     
+---------
+
+(somewhere else)
+---------
+   ???     Val   <--- %rsp
+---------
+======================================
+
+---------
+   ???     X + 8
+---------
+   Val     X     <--- %rsp
+---------
+
+movq (%rsp), %rsp
+addq $8, %rsp
+
+---------
+   ???     X + 8 <--- %rsp
+---------
+   Val     X     
+---------
+
+
+movq (%rsp), %rsp
+addq $8, %rsp
+
+The above instructions are not equivalent to popq %rsp.
+
+
+B. How could you rewrite the code sequence so that it correctly describe both
+   the cases where REG is %rsp as well as any other register?
+
+addq $8, %rsp
+movq -8(%rsp), REG
+
+=====================================
+---------
+   ???     X + 8
+---------
+   Val     X     <--- %rsp
+---------
+
+addq $8, %rsp
+
+---------
+   ???     X + 8 <--- %rsp
+---------
+   Val     X    
+---------
+
+movq -8(%rsp), REG
+
+REG: Val, if REG = %rsp, then %rsp = Val
+
+---------
+   ???     Val <--- %rsp
+---------

@@ -1,0 +1,7 @@
+Write HCL code for the signal set_cc in the PIPE implementation.
+This should only occur for Opq instructions, and should consider
+the effects of program exceptions.
+
+bool set_cc = 
+    E_icode == IOPq &&
+    !m_stat in { SADR, SINS, SHLT } && !W_stat in { SADR, SINS, SHLT };

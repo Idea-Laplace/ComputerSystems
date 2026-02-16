@@ -1,0 +1,20 @@
+Write HCL code for the signal M_bubble and W_stall in the PIPE implementation.
+The latter signal requires modifying the exception condition listed in Figure 4.64.
+
+Figure 4.64
+
+----------------------------------------------------------------------------------------
+Condtion                Trigger
+----------------------------------------------------------------------------------------
+Processing ret          IRET in { D_icode, E_icode, M_icode }
+Load/Use hazard         E_icode in { IMRMOVQ, IPUSHQ } && E_dstM in { d_srcA, d_srcB }
+Misprediction branch    E_icode == IJXX && !e_Cnd
+Exception               m_stat in { SADR, SINS, SHLT } || W_stat in { SADR, SINS, SHLT }
+----------------------------------------------------------------------------------------
+
+
+bool M_bubble = 
+    m_stat in { SADR, SINS, SHLT } ||
+    W_stat in { SADR, SINS, SHLT };
+
+bool W_stall = W_stat in { SADR, SINS, SHLT };

@@ -1,0 +1,99 @@
+Let us analyze the relative performance of using conditional data transfers versus
+condtional control transfers for the programs you wrote for Problem 4.5 and 4.6.
+Assume that we are using these programs to compute the sum of the absolute values
+of a very long array, and so the overall performance is determined largely by the number
+of cycles required by inner loop. Assume that our jump instructions are predicted as being
+taken, and that around 50% of the array values are positive.
+
+
+
+A. On average, how many instructions are executed in the inner loops of the 2 programs?
+
+B. On average, how many bubbles would be injected into the inner loops of the 2 programs?
+
+C. What is the average number of clock cycles retuired per array element for the 2 programs?
+
+
+sol)
+Assume that  N >> 0, where N is the length of a given array.
+So the vast majority of instructions will be:
+
+----------------------------------------------------------------------------
+
+Conditional jump >
+absSum:
+	irmovq $8, %r8			# Constant 8, the quadword width
+	irmovq $1, %r9			# Constant 1, index increment
+	xorq %rax, %rax			# Set 0 in %rax
+	andq %rsi, %rsi			# CC update, whether or not index is below 0.
+	jmp test
+loop:
+	mrmovq (%rdi), %r10		# Save the first argument, (%rdi): arr[n]
+    xorq %r11, %r11         # set 0.
+    subq %r10, %r11         # set -arr[n].
+	jle pos
+    rrmovq %r11, %r10       # If arr[n] is negative, reverse the value.
+pos:
+    addq %r10, %rax         # Add to %rax,
+	addq %r8, %rdi			# Next array element address
+	subq %r9, %rsi			# Addition count update, should be nonnegative integer, CC update.
+test:
+	jne loop				# Loop condition
+	ret
+
+
+Conditional move >
+absSum:
+	irmovq $8, %r8			# Constant 8, the quadword width
+	irmovq $1, %r9			# Constant 1, index increment
+	xorq %rax, %rax			# Set 0 in %rax
+	andq %rsi, %rsi			# CC update.
+	jmp test
+loop:
+    mrmovq (%rdi), %r10
+    xorq %r11, %r11
+    subq %r10, %r11
+    cmovq %r11, %r10
+    addq %r10, %rax         # Add to %rax,
+	addq %r8, %rdi			# Next array element address
+	subq %r9, %rsi			# Addition count update, should be positive integer.
+test:
+	jne loop				# Loop condition
+	ret
+
+----------------------------------------------------------------------------
+A)
+Conditional jump:
+Number of inner loop instructions: 8 if jle is taken else 9.
+Since the portion of positive numbers in a given array is about 50%,
+the average instructions taken would be 0.5 * 8 + 0.5 * 9 = 8.5
+
+Conditional move:
+Number of inner loop instructions: always 8.
+
+B)
+Loop test would be always taken except for the case of end of array, negligible.
+
+Conditional jump:
+Given that 'always taken' strategy is selected for this problem, probability
+of misprediction is 0.5 and one jump instruction(excluding the meaningless 'jne loop' instruction.)
+we can say that 2 bubbles could be inserted by 50% probability in every loop.
+
+1 bubble per loop on average.( 2 bubble * 0.5 / loop = 1 bubble / loop)
+
+Conditional move:
+No bubbles would be injected. (Except the end of loop, of course. Negligible.)
+
+C)
+Conditional jump:
+8.5 instruction and 1 bubble would be inserted in pipeline while loop,
+hence (8.5 + 1) cycle = 9.5 cycle will be required.
+Best: 8 cycle
+Worst: 11 cycle # (8 + 1) + 2
+(8 + 11) / 2 = 9.5, as predicted.
+
+Conditional move:
+Just 8 instructions, so 8 cycle will be required.
+
+On average, condtional move requires less cycles per loop than conditional jump does by 1.5 cycle.
+9.5/8 = 1.19, about 20%.

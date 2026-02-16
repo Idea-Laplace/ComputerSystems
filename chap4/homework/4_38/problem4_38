@@ -1,0 +1,2 @@
+Write a Y86-64 assembly language program that causes combination B to arise
+and complete with a halt inctruction if the pipeline operates correctly.
