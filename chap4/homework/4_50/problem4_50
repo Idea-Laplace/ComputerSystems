@@ -1,0 +1,10 @@
+    In section 3.6.8, we saw that a common way to implement switch statement is to
+create a set of code blocks and then index those blocks using a jump table.
+Consider the C code shown in Figure 4.69 for a function switchv, along with associated
+test code.
+    Implement switchv in Y86-64 using a jump table. Although the Y86-64 instruction set
+does not include an indirect jump instruction, you can get the same effect by pushing a
+computed address onto the stack and then executing the ret instruction. Implement test
+code similar to what is shoun in C to demonstrate that your implementation of switchv
+will handle both the cases explicitly as well as those that trigger the default case.
+ 

@@ -1,0 +1,78 @@
+.pos 0
+irmovq  stack, %rsp
+call main
+halt
+
+.align 8
+jump_table:
+    .quad   case0
+    .quad   default
+    .quad   case2_5
+    .quad   case3
+    .quad   default
+    .quad   case2_5
+    
+switchv:
+    irmovq  $0, %r9
+    subq    %rdi, %r9           # Set CC, idx < 0?
+    jg      default
+    irmovq  $5, %r9
+    subq    %rdi, %r9           # Set CC, idx > 5?
+    jl      default             # Since Y86-64 doesn't have unsigned comparation, 2 jmpXX required.
+    addq    %rdi, %rdi          # In this problem, the least explicit case is 0, hence no scaling is needed.
+    addq    %rdi, %rdi          # Otherwise, we should scale the least explicit case to 0.
+    addq    %rdi, %rdi          # 8 * idx, quad-word size adjustment.
+    irmovq  jump_table, %rax
+    addq    %rdi, %rax          # jump_table + (8 * idx), jump_table + idx in address representation.
+    mrmovq  (%rax), %rax        # Actual destination(jump_table[idx]) saved.
+    pushq   %rax                # Save target on stack
+    ret                         # PC will jump to jump_table + idx.
+case0:
+    irmovq  $0xaaa, %rax
+    jmp     done
+case2_5:
+    irmovq  $0xbbb, %rax
+    jmp     done
+case3:
+    irmovq  $0xccc, %rax
+    jmp     done
+default:
+    irmovq  $0xddd, %rax
+done:
+    ret                        # Actual function return.
+
+# Test code================================================================================================
+
+.align 8
+test_array:
+    .quad   0xffffffffffffffff
+    .quad   0x0
+    .quad   0x1
+    .quad   0x2
+    .quad   0x3
+    .quad   0x4
+    .quad   0x5
+    .quad   0x6
+
+main:
+    rrmovq  %rsp, %rbp
+    irmovq  test_array, %rsi    # test_array save.
+    rrmovq  %rsi, %rdx          # Loop index initialization
+    irmovq  $8, %r8             # increment step value
+    jmp     test                # Guarded-do
+loop:
+    mrmovq  (%rdx), %rdi
+    call    switchv
+    addq    %r8, %rdx           # address update (+8)
+    pushq   %rax
+test:
+    irmovq  $64, %r9
+    addq    %rsi, %r9
+    subq    %rdx, %r9
+    jg      loop
+
+    rrmovq  %rbp, %rsp
+    ret
+
+.pos 0x200
+stack:

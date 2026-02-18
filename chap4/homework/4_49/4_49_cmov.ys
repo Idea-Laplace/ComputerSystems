@@ -1,0 +1,67 @@
+bubblesort_pointer:
+# Prologue======================
+    pushq   %rbp                # Callee saved.
+    rrmovq  %rsp, %rbp          # Set base stack pointer.
+    irmovq  $48, %rdx           # Secure stack memory space.
+    subq    %rdx, %rsp          # Updated stack pointer
+# ==============================
+    rmmovq  %rdi, -40(%rbp)     # Array address store at -40(%rbp) (5-quadword below)
+    rmmovq  %rsi, -48(%rbp)     # Array length(N) store at -48(%rbp)[length] (6-quadword below)
+    irmovq  $1, %rdx            # Minimum length(count).
+    subq    %rsi, %rdx          # Fast return check.
+    jge     fast_return         # If count <= 1, fast return
+    mrmovq  -48(%rbp), %rax     # Copy N to %rax
+    addq    %rax, %rax          # 2 * R[%rax]
+    addq    %rax, %rax          # 2 * R[%rax], total 4 * R[%rax]
+    addq    %rax, %rax          # 2 * R[%rax], total 8 * R[%rax], N * (word size)
+    irmovq  $-8, %rdx           # -1 index to %rdx (in context of the word size 8)
+    addq    %rax, %rdx          # N-1 index(end element index) to %rdx, 8*(N-1) is the acutal value.
+    mrmovq  -40(%rbp), %rax     # Overwrite array address to %rax
+    addq    %rdx, %rax          # &arr[N-1] to %rax 
+    rmmovq  %rax, -16(%rbp)     # Initialize -16(%rbp)[tail] with &arr[N-1] (outer loop initialization)
+    jmp outer_loop_test         # Goto outer loop test.
+outer_loop:
+    mrmovq  -40(%rbp), %rax     # %rax to &arr[0], inner loop initialization.
+    rmmovq  %rax, -24(%rbp)     # Save %rax at -24(%rbp) [head]. 
+    jmp     inner_loop_test     # Goto inner loop test.
+inner_loop:
+    mrmovq  -24(%rbp), %rax     # When inner loop test is passed, restore head into %rax.
+    rrmovq  %rax, %r8           # Copy head at %r8
+    xorq    %r9, %r9            # Set 0.
+    mrmovq  8(%rax), %rdx       # *(head + 1) at %rdx
+    mrmovq  (%rax), %rax        # *head at %rax.
+    subq    %rax, %rdx          # Set CC.
+    rrmovq  %rdx, %r10          # Save *(head + 1) - *(head) in %r10.
+    mrmovq  8(%r8), %rdx        # Restore *(head + 1) at %rdx
+    cmovg   %r9, %r10           # If *(head + 1) > *head, clear %r10   
+    addq    %r10, %rax          # *head + [*(head + 1) - *head] = *(head + 1) if not aligned else *head + 0 = *head itself.
+    rmmovq  %rax, (%r8)         
+    subq   %r10, %rdx           # *(head + 1) - [*(head + 1) - *head] = *head if not aligned else *(head + 1) - 0 = *(head + 1) itself.
+    rmmovq  %rdx, 8(%r8)        # Only 1 cmovXX used.
+    
+# ==============================
+    irmovq  $8, %rdx            # Index 1 for a quadword
+    mrmovq  -24(%rbp), %rax     # Just for safety.
+    addq    %rdx, %rax          # head + 1 
+    rmmovq  %rax, -24(%rbp)     # head++, inner loop condtion updated.
+inner_loop_test:
+    mrmovq  -16(%rbp), %rax     # Transfer 'tail' to %rax  
+    mrmovq  -24(%rbp), %rdx     # Y86-64 doesn't support mem-reg operation, call current head
+    subq    %rdx, %rax          # tail - head condition
+    jg      inner_loop          # if tail > head, inner loop repeats.
+    
+    irmovq  $8, %rdx            # Quad word size
+    mrmovq  -16(%rbp), %rax     # Save for operation
+    subq    %rdx, %rax          # tail - 1
+    rmmovq  %rax, -16(%rbp)     # tail--, outer loop condtion update.
+outer_loop_test:
+    mrmovq  -16(%rbp), %rax     # Update %rax to decremented value of tail (At first &arr[N-1])
+    mrmovq  -40(%rbp), %rdx     # Y86-64 doesn't support mem-reg operation, &arr[0] saved.
+    subq    %rdx, %rax          # tail - &arr[0] condition
+    jg      outer_loop          # When tail > &arr[0], loop again. 
+# Epilogue======================
+fast_return:
+    rrmovq  %rbp, %rsp          # Clear assigned stack memory block.
+    popq    %rbp                # When all loops are done, restore the callee saved %rbp register.
+    ret
+
