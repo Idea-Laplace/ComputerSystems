@@ -1,0 +1,94 @@
+Compare the performance of the 3 versions of bubblesort(Problem 4.47-4.49).
+Explain why one version performs better than the other.
+
+4.47
+inner_loop:
+    mrmovq  -24(%rbp), %rax      # When inner loop test is passed, restore %rax to head value.
+    mrmovq  8(%rax), %rdx        # Save *(head + 1) at %rdx.
+    mrmovq  (%rax), %rax         # Save *head at %rax.
+    subq    %rax, %rdx           # *(head + 1) - *head, Y86-64 only has subq, not cmp.
+    jge     aligned              # When already *(head + 1) >= *head, skip exchange process.
+# Condition=====================
+    mrmovq  -24(%rbp), %rax      # Restore %rax from *head to head.
+    mrmovq  8(%rax), %rax        # Save *(head + 1), overall, %rax: *head -> *(head + 1) occurs.
+    rmmovq  %rax, -8(%rbp)       # Temporary variable address -8(%rbp), saving *(head + 1).
+    mrmovq  -24(%rbp), %rax      # Again, %rax is head
+    irmovq  $8, %rdx             # Index 1
+    addq    %rax, %rdx           # Now %rdx is head + 1.
+    mrmovq  (%rax), %rax         # %rax holds *head.
+    rmmovq  %rax, (%rdx)         # At head + 1, its value would be updated to current *head.
+    mrmovq  -24(%rbp), %rax      # Once again, %rax is head.
+    mrmovq  -8(%rbp), %rdx       # previous *(head + 1)
+    rmmovq  %rdx, (%rax)         # At head, its value would be updated to previous *(head + 1), exchange complete.
+aligned:
+    irmovq  $8, %rdx             # Index 1 for a quadword
+    mrmovq  -24(%rbp), %rax      # Just for safety.
+    addq    %rdx, %rax           # head + 1 
+    rmmovq  %rax, -24(%rbp)      # head++, inner loop condtion updated.
+# ==============================
+
+# Ignored load/use hazard.
+Cycles when aligned : 9(instruction) 
+Cycles when not aligned : 20(instruction) + 2(bubble) = 22
+Average (aligned : not aligned) = 1:1
+Average cycles: 0.5 * 9 + 0.5 * 22 = 15.5
+Best cycles : 9
+Worst cycles : 22
+
+
+
+4.48
+inner_loop:
+    mrmovq  -24(%rbp), %rax      # When inner loop test is passed, restore head into %rax.
+    rrmovq  %rax, %r8            # Copy head at %r8
+    mrmovq  (%r8), %r9           # Copy *head at %r9[temp]
+    mrmovq  8(%rax), %rdx        # *(head + 1) at %rdx
+    mrmovq  (%rax), %rax         # *head at %rax.
+    subq    %rax, %rdx           # Set CC.
+    mrmovq  8(%r8), %rdx         # Restore *(head + 1) at %rdx
+    cmovl   %rdx, %rax           # if *(head + 1) < *head, *head = *(head + 1)
+    rmmovq  %rax, (%r8)         
+    cmovl   %r9, %rdx            # Same, *(head + 1) = temp, previous *head
+    rmmovq  %rdx, 8(%r8)         # Total 2 cmov counted.
+    
+# ==============================
+    irmovq  $8, %rdx             # Index 1 for a quadword
+    mrmovq  -24(%rbp), %rax      # Just for safety.
+    addq    %rdx, %rax           # head + 1 
+    rmmovq  %rax, -24(%rbp)      # head++, inner loop condtion updated.
+
+# Ignored load/use hazard.
+Cycles: 15
+
+
+
+4.49
+inner_loop:
+    mrmovq  -24(%rbp), %rax      # When inner loop test is passed, restore head into %rax.
+    rrmovq  %rax, %r8            # Copy head at %r8
+    xorq    %r9, %r9             # Set 0.
+    mrmovq  8(%rax), %rdx        # *(head + 1) at %rdx
+    mrmovq  (%rax), %rax         # *head at %rax.
+    subq    %rax, %rdx           # Set CC.
+    rrmovq  %rdx, %r10           # Save *(head + 1) - *(head) in %r10.
+    mrmovq  8(%r8), %rdx         # Restore *(head + 1) at %rdx
+    cmovg   %r9, %r10            # If *(head + 1) > *head, clear %r10   
+    addq    %r10, %rax           # *head + [*(head + 1) - *head] = *(head + 1) if not aligned else *head + 0 = *head itself.
+    rmmovq  %rax, (%r8)         
+    subq   %r10, %rdx            # *(head + 1) - [*(head + 1) - *head] = *head if not aligned else *(head + 1) - 0 = *(head + 1) itself.
+    rmmovq  %rdx, 8(%r8)         # Only 1 cmovXX used.
+    
+# ==============================
+    irmovq  $8, %rdx             # Index 1 for a quadword
+    mrmovq  -24(%rbp), %rax      # Just for safety.
+    addq    %rdx, %rax           # head + 1 
+    rmmovq  %rax, -24(%rbp)      # head++, inner loop condtion updated.
+
+# Ignored load/use hazard.
+Cycles: 17
+
+Performance:
+(It is possible that load/use hazard would change the following performance order.
+ but for simplicity, we only focus on comparison btw conditional jump and conditional move)
+
+4.47(9, best) > 4.48(15) > 4.47(15.5, average) > 4.49(17) > 4.47(22, worst)

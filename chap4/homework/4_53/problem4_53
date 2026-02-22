@@ -1,0 +1,27 @@
+    Suppose we wanted to create a lower-cost pipelined processor based on the
+structure we devised for PIPE- without any bypassing. The design would handle
+all data dependencies by stalling until the instruction generating a needed
+value has passed through the write-back stage.
+    The file pipe-stall.hcl[pipe-nobypass.hcl] contains a modified version of
+the HCL code for PIPE in which the bypassing logic has been disabled. That is,
+the signals e_valA and e_valB are simply declared as follows:
+
+## Do not MODIFY THE FOLLOWING CODE.
+## No forwarding. valA is either valP or value from register file
+
+word d_valA = [
+    D_icode in { ICALL, IJXX } : D_valP # Use incremented PC.
+    1: d_rvalA                          # Use value read from register file.
+];
+
+## No forwarding, valB is value from register file
+word d_valB = d_rvalB
+
+Modify the pipeline control logic at the end of this file so that it correctly
+handles all possible control and data hazards. As part of your design effort,
+you should analyze the different combinations of control cases, as we did in the
+design of the pipline control logic for PIPE, You will find that many different
+combinations can occur, since many more conditions require the pipeline to stall.
+Make sure your control logic handes each combination correctly. See tha lab material
+for directions on how to generate a simulator for your solution and how to test it.
+

@@ -1,0 +1,58 @@
+    Our pipelined design is a bit unrealistic in that we have 2 write ports for the
+register file, but only the popq instruction requires 2 simultaneous writes to the
+register file. The other instructions could therefore use a single write port, sharing
+this for writing valE and valM. The following figure show a modified version of the
+write-back logic, in which we merge the write-back register IDs(W_dstE and W_dstM)
+into a single signal w_dstE and the write-back values(W_valE and W_valM) into a single
+signal w_valE:
+
+The logic for performing the merges is written in HCL as follows:
+
+## Set E port register ID
+word w_dstE = [
+    ## Writing from valM
+    W_dstM != RNONE : W_dstM;
+    1 : W_dstE;
+];
+
+## Set E port value
+word w_valE = [
+    W_dstM != RNONE : W_valM;
+    1 : W_valE;
+];
+
+    The control for these multiplexors is determined by dstE-when it indicates there is
+some register, then it selects the value for port E, and otherwise it selects the value
+for port M.
+    In the simulation model, we can then disable register port M, as shown by the following
+HCL code:
+
+## Disable register port M
+## Set M port register ID
+word w_dstM = RNONE;
+
+## Set M port value
+word w_valM = 0;
+
+    The challenge then becomes to devise a way to handle popq. One method is to use the
+control logic to dynamically process the instruction popq rA so that it has the same
+effect as the 2-instruction sequence
+
+iaddq $8, %rsp
+mrmovq -8(%rsp), rA
+
+Note the ordering of the 2 instrcuions to make sure popq %rsp works properly. You can do
+this by having the logic in the decode stage treat popq the same as it would the iaddq
+listed above, except that it predicts the next PC to be equal to the current PC. On the
+next cycle, the popq instruction is refetched, but the instruction code is converted to
+as special value IPOP2. This is treated as a special instruction that has same behavior
+as the mrmovq instruction listed above.
+    The file pipe-lw.hcl contains the modified write port logic described above. It 
+contains a declaration of the constant IPOP2 having hexadecimal value E. It also contains
+the definition of a signal f_icode that generates the icode field fro pipeline register D.
+This definition can be modified to insert the instruction code IPOP2 the second time the
+popq instruction if fetched. The HCL file also contains a declaration of the signal f_pc,
+the value of the program counter generated in the fetch stage by the block labeled "Select PC"
+    Modify the control logic in this file to process popq instructions in the manner we
+have described. See the lab material for directions on how to generates a simulator for
+your solution and how to test it.

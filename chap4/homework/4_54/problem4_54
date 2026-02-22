@@ -1,0 +1,4 @@
+    The file pipe-full.hcl contains a copy of the PIPE HCL description, along with
+a declaration of the constant value IIADDQ. Modify this file to implement the iaddq
+instruction, as described in practice 4.3 and problem 4.51. See the lab material for
+direction on how to generate a simulator for your solution and how to test it.
